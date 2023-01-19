@@ -1,10 +1,10 @@
-package com.rocket.rockettime;
+package com.rockettime.rocketapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RocketTimeApplicationTests {
+class RocketApiApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -4,7 +4,7 @@ import { Dropdown } from 'flowbite-react';
 import { UserStore } from '@/stores/UserStore';
 
 const Nav = () => {
-    const { firstName, lastName } = UserStore();
+    const { firstName, lastName, role } = UserStore();
 
     return (
         <nav className="bg-blue-500 border-gray-200 px-2 sm:px-4 py-2.5">
@@ -17,8 +17,14 @@ const Nav = () => {
                     <div className=''>
                         <Dropdown label={firstName + " " + lastName} dismissOnClick={false}>
                             <Dropdown.Item>Profile</Dropdown.Item>
-                            <Dropdown.Item>Admin Dashboard</Dropdown.Item>
-                            <Dropdown.Divider />
+                            {role >= 1 ? (
+                                <>
+                                    <Dropdown.Item>Admin Dashboard</Dropdown.Item>
+                                    <Dropdown.Divider />
+                                </>
+                            ) : (
+                                <Dropdown.Divider />
+                            )}
                             <Dropdown.Item>Sign out</Dropdown.Item>
                         </Dropdown>
                     </div>

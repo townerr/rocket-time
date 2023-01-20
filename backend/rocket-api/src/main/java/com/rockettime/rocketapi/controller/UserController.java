@@ -31,7 +31,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/users")
+    @GetMapping("/user")
     public UserEntity getUserById(@RequestParam Integer id) {
         try {
             return userService.getUserById(id);

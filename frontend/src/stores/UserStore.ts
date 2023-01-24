@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 type UserState = {
-  userId: number;
+  userId: number | undefined;
   firstName: string;
   lastName: string;
   email: string;
@@ -10,7 +10,7 @@ type UserState = {
 }
 
 export const UserStore = create<UserState>((set) => ({
-  userId: 1,
+  userId: undefined,
   firstName: 'Ryan',
   lastName: 'Towner',
   email: 'ryan@towner.com',

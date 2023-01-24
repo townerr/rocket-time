@@ -1,9 +1,57 @@
 import Login from '@/components/Login';
+import Profile from '@/components/Profile';
+import Register from '@/components/Register';
 import Head from 'next/head';
 import Nav from '@/components/Nav';
 import Timesheet from '@/components/Timesheet';
+import { useState } from 'react';
+import { UserStore } from '@/stores/UserStore';
 
 export default function Home() {
+  const [page, setPage] = useState("login");
+  const { userId } = UserStore();
+
+  function showPage(p: string) {
+    if(userId !== undefined) {
+      switch(p) {
+        case "timesheet":
+          return (
+            <>
+              <Nav setPage={setPage} />
+              <Timesheet />
+            </>
+          )
+        case "calendar":
+          return (
+            <>
+              <Nav setPage={setPage} />
+              <div>Calendar</div>
+            </>
+          )
+        case "profile":
+          return (
+            <>
+              <Nav setPage={setPage} />
+              <Profile />
+            </>
+          )
+        case "admin":
+          return (
+            <>
+              <Nav setPage={setPage} />
+              <div>Admin</div>
+            </>
+          )
+      }
+    }
+    else {
+      if(p === "login")
+        return <Login setPage={setPage} />
+      else if(p === "register")
+        return <Register setPage={setPage} />
+    }
+  }
+
   return (
     <>
       <Head>
@@ -13,8 +61,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Nav />
-        <Timesheet />
+        {showPage(page)}
       </main>
     </>
   )

@@ -1,6 +1,10 @@
-import React, { useState } from 'react'
+import React, { Dispatch, SetStateAction, useState } from 'react';
 
-const Register = () => {
+type RegisterProps = {
+  setPage: Dispatch<SetStateAction<string>>;
+}
+
+const Register = (p: RegisterProps) => {
   const [firstName, setFirstName] = useState();
   const [lastName, setLastName] = useState();
   const [email, setEmail] = useState();
@@ -9,6 +13,9 @@ const Register = () => {
   
   function register() {
     //tanstack query to register
+
+    //then back to login
+    p.setPage("login");
   }
 
   function hashPassword() {
@@ -29,7 +36,7 @@ const Register = () => {
                 <input className="h-10 p-2 my-2 rounded-lg" type="password" placeholder="Confirm Password" />
             </div>
             <div className="flex flex-row gap-2 mt-4 justify-center text-center">
-                <button className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 w-36 border-green-700 hover:border-green-500 rounded">Register</button>
+                <button className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 w-36 border-green-700 hover:border-green-500 rounded" onClick={register}>Register</button>
             </div>
         </form>
     </div>

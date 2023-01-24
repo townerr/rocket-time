@@ -1,7 +1,13 @@
-import React, { useState } from 'react'
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import { UserStore } from '@/stores/UserStore';
 
-const Login = () => {
-  const [email, setEmail] = useState();
+type LoginProps = {
+  setPage: Dispatch<SetStateAction<string>>;
+}
+
+const Login = (p: LoginProps) => {
+  const { updateUserId } = UserStore();
+  const [inputEmail, setInputEmail] = useState();
   const [password, setPassword] = useState();
   let passwordHash;
 
@@ -9,11 +15,18 @@ const Login = () => {
     //tanstack query to login
 
     //set userstore
+    updateUserId(1);
+    //then to homepage
+    p.setPage("timesheet")
   }
 
   function hashPassword() {
     //hash with bcrypt
 
+  }
+
+  function setPageRegister() {
+    p.setPage("register");
   }
 
   return (
@@ -27,8 +40,8 @@ const Login = () => {
                 <input className="h-10 p-2 my-2 rounded-lg" type="password" placeholder="Password" />
             </div>
             <div className="flex flex-row gap-2 mt-4 justify-center text-center">
-                <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 w-36 border-blue-700 hover:border-blue-500 rounded">Login</button>
-                <button className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 w-36 border-green-700 hover:border-green-500 rounded">Register</button>
+                <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 w-36 border-blue-700 hover:border-blue-500 rounded" onClick={login}>Login</button>
+                <button className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 w-36 border-green-700 hover:border-green-500 rounded" onClick={setPageRegister}>Register</button>
             </div>
         </form>
     </div>

@@ -1,10 +1,30 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import Link from 'next/link';
 import { Dropdown } from 'flowbite-react';
 import { UserStore } from '@/stores/UserStore';
 
-const Nav = () => {
+type NavProps = {
+    setPage: Dispatch<SetStateAction<string>>;
+}
+
+const Nav = (page: NavProps) => {
     const { firstName, lastName, role } = UserStore();
+
+    function setPageTimesheet() {
+        page.setPage("timesheet");
+    }
+
+    function setPageCalendar() {
+        page.setPage("calendar");
+    }
+
+    function setPageProfile() {
+        page.setPage("profile");
+    }
+
+    function setPageAdmin() {
+        page.setPage("admin");
+    }
 
     return (
         <nav className="bg-blue-500 border-gray-200 px-2 sm:px-4 py-2.5">
@@ -16,10 +36,10 @@ const Nav = () => {
                 <div className="flex md:order-2 gap-2">
                     <div className=''>
                         <Dropdown label={firstName + " " + lastName} dismissOnClick={false}>
-                            <Dropdown.Item>Profile</Dropdown.Item>
+                            <Dropdown.Item onClick={setPageProfile}>Profile</Dropdown.Item>
                             {role >= 1 ? (
                                 <>
-                                    <Dropdown.Item>Admin Dashboard</Dropdown.Item>
+                                    <Dropdown.Item onClick={setPageAdmin}>Admin Dashboard</Dropdown.Item>
                                     <Dropdown.Divider />
                                 </>
                             ) : (
@@ -36,10 +56,10 @@ const Nav = () => {
                 <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-default">
                     <ul className="flex flex-col mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:mt-0 md:text-sm md:font-medium md:border-0 md:bg-blue-700">
                         <li className="hover:bg-blue-800 p-4 rounded-lg">
-                            <button className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:p-0" aria-current="page">Timesheets</button>
+                            <button className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:p-0" aria-current="page" onClick={setPageTimesheet}>Timesheets</button>
                         </li>
                         <li className="hover:bg-blue-800 p-4 rounded-lg">
-                            <button className="block py-2 pl-3 pr-4 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:p-0">Calendar</button>
+                            <button className="block py-2 pl-3 pr-4 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:p-0" onClick={setPageCalendar}>Calendar</button>
                         </li>
                     </ul>
                 </div>

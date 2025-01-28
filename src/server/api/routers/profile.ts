@@ -56,4 +56,36 @@ export const profileRouter = createTRPCRouter({
         data: input,
       });
     }),
+
+  getBalances: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+      select: {
+        sickBalance: true,
+        vacationBalance: true,
+      },
+    });
+
+    const entries = await ctx.db.entry.findMany({
+      where: {
+        timesheet: {
+          userId: ctx.session.user.id,
+        },
+        type: {
+          in: ['Vacation', 'Sick'],
+        },
+      },
+      include: {
+        timesheet: true,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+
+    return {
+      balances: user,
+      history: entries,
+    };
+  }),
 }); 

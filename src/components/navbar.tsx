@@ -18,7 +18,7 @@ import { ChevronDown } from "lucide-react";
 
 export default function Navbar({ session }: { session: { user?: User } | null }) {
   return (
-    <nav className="bg-[#2e026d] border-b border-black shadow-sm sticky top-0 z-50">
+    <nav className="bg-black shadow-sm sticky top-0 z-50">
       <div className="container flex h-16 items-center justify-between px-4 mx-auto">
         {/* Left side - Logo */}
         <Link href="/" className="flex items-center gap-2">
@@ -35,7 +35,7 @@ export default function Navbar({ session }: { session: { user?: User } | null })
                   <NavigationMenuItem>
                     <Link href="/timesheet" legacyBehavior passHref>
                       <NavigationMenuLink className={cn(
-                        "text-sm text-white font-medium transition-colors hover:text-purple-900", "hover:bg-accent", "rounded-md px-3.5 py-2.5"
+                        "text-sm text-white font-medium transition-colors hover:text-black", "hover:bg-accent", "rounded-md px-3.5 py-2.5"
                       )}>
                         Timesheet
                       </NavigationMenuLink>
@@ -44,7 +44,7 @@ export default function Navbar({ session }: { session: { user?: User } | null })
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="text-white hover:text-purple-900">
+                      <Button variant="ghost" className="text-white">
                         Manager <ChevronDown className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -69,17 +69,17 @@ export default function Navbar({ session }: { session: { user?: User } | null })
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={session.user.image ?? undefined} />
                   </Avatar>
-                  <ChevronDown className="text-white w-4 h-4" />
+                  <ChevronDown className="text-white w-4 h-4 hover:animate-pulse" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem asChild>
                     <Link href="/profile">Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/balances">Balances</Link>
+                    <Link href="/profile/balances">Balances</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/history">History</Link>
+                    <Link href="/profile/history">History</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => signOut({ callbackUrl: "/" })}

@@ -1,6 +1,7 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 import { db } from "~/server/db";
 
@@ -11,18 +12,13 @@ import { db } from "~/server/db";
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
  */
 declare module "next-auth" {
-  interface Session extends DefaultSession {
-    user: {
-      id: string;
-      // ...other properties
-      // role: UserRole;
-    } & DefaultSession["user"];
-  }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  	interface Session extends DefaultSession {
+		user: {
+			id: string;
+			// ...other properties
+			// role: UserRole;
+		} & DefaultSession["user"];
+  	}
 }
 
 /**
@@ -30,27 +26,50 @@ declare module "next-auth" {
  *
  * @see https://next-auth.js.org/configuration/options
  */
+
+//TODO: add github and google provider
+//TODO: add first name and last name to credentials provider
 export const authConfig = {
-  providers: [
-    DiscordProvider,
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
-  ],
-  adapter: PrismaAdapter(db),
-  callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
-  },
+	providers: [
+		/*CredentialsProvider({
+			name: "Credentials",
+			credentials: {
+				Email: { label: "Email", type: "text", placeholder: "email" },
+				password: { label: "Password", type: "password", placeholder: "password"},
+			},
+			async authorize(credentials) {
+				const user = await db.user.findUnique({
+					where: { email: credentials.Email as string },
+				});
+				if (!user) {
+					return null;
+				} else {
+					const bcrypt = require('bcrypt');
+					const passwordMatch = await bcrypt.compare(credentials.password as string, user.passwordHash as string);
+					if (!passwordMatch) {
+						return null;
+					} else {
+						return user;
+					}
+				}
+			},
+		}),*/
+		DiscordProvider,
+	],
+	adapter: PrismaAdapter(db),
+	callbacks: {
+		/*signIn: async ({ user }) => {
+			if (user) {
+				return true;
+			}
+			return false;
+		},*/
+		session: ({ session, user }) => ({
+			...session,
+			user: {
+				...session.user,
+				id: user.id,
+			},
+		}),
+	},
 } satisfies NextAuthConfig;

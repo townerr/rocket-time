@@ -3,7 +3,7 @@ import React from 'react'
 const RocketIcon = () => {
     return (
         <svg
-            className="h-6 w-6 text-white hover:text-purple-300 transition-colors duration-300"
+            className="h-6 w-6 text-white hover:animate-spin transition-colors duration-300"
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"

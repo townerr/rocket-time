@@ -23,7 +23,7 @@ export default function Navbar({ session }: { session: { user?: User } | null })
         {/* Left side - Logo */}
         <Link href="/" className="flex items-center gap-2">
           <RocketIcon />
-          <span className="font-bold text-lg text-white hover:text-purple-300 transition-colors duration-300">RocketTime</span>
+          <span className="font-bold text-lg text-white hover:underline transition-colors duration-300">RocketTime</span>
         </Link>
 
         {/* Right side - Navigation */}

@@ -1,8 +1,8 @@
 "use client";
 
 import { api } from "~/trpc/react";
-import { LeaveBalanceCard } from "./components/leave-balance-card";
-import { LeaveHistory } from "./components/leave-history";
+import { LeaveBalanceCard } from "~/components/leave-balance-card";
+import { LeaveHistory } from "~/components/leave-history";
 
 const TOTAL_SICK_HOURS = 40;
 const TOTAL_VACATION_HOURS = 120;

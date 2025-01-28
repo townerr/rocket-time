@@ -64,9 +64,14 @@ model User {
     image         String?
     passwordHash  String?
     emailVerified DateTime?
+    isManager     Boolean   @default(false)
+    managerId     String?
+    sickBalance   Float     @default(40)
+    vacationBalance Float @default(120)
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    timesheets    Timesheet[]
 }
 
 model VerificationToken {
@@ -75,4 +80,28 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Timesheet {
+    id        String    @id @default(cuid())
+    userId    String
+    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    weekStart DateTime
+    weekEnd   DateTime
+    status    String?   // blank or 'pending'
+    entries   Entry[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+}
+
+model Entry {
+    id          String    @id @default(cuid())
+    timesheetId String
+    timesheet   Timesheet @relation(fields: [timesheetId], references: [id])
+    date        DateTime
+    type        String    // 'project', 'vacation', 'sick', 'holiday'
+    projectCode String?
+    hours       Float
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
 }

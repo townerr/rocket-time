@@ -88,4 +88,22 @@ export const profileRouter = createTRPCRouter({
       history: entries,
     };
   }),
+
+  getTimesheetHistory: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.timesheet.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
+      include: {
+        entries: {
+          orderBy: {
+            date: 'asc',
+          },
+        },
+      },
+      orderBy: {
+        weekStart: 'desc',
+      },
+    });
+  }),
 }); 

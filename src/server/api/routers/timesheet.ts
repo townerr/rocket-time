@@ -1,33 +1,46 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { startOfWeek, endOfWeek } from "date-fns";
 
 export const timesheetRouter = createTRPCRouter({
-  getTimesheet: protectedProcedure
-    .input(z.object({
-      weekStart: z.date(),
-      weekEnd: z.date(),
-    }))
+  getCurrentTimesheet: protectedProcedure
+    .input(z.object({ weekStart: z.date() }))
     .query(async ({ ctx, input }) => {
-      const timesheet = await ctx.db.timesheet.findFirst({
+      const weekStart = startOfWeek(input.weekStart, { weekStartsOn: 1 });
+      const weekEnd = endOfWeek(input.weekStart, { weekStartsOn: 1 });
+
+      let timesheet = await ctx.db.timesheet.findFirst({
         where: {
           userId: ctx.session.user.id,
-          weekStart: input.weekStart,
-          weekEnd: input.weekEnd,
+          weekStart,
+          weekEnd,
         },
         include: {
-          entries: true,
+          entries: {
+            include: {
+              type: true,
+            },
+            orderBy: {
+              date: 'asc',
+            },
+          },
         },
       });
 
       if (!timesheet) {
-        return ctx.db.timesheet.create({
+        timesheet = await ctx.db.timesheet.create({
           data: {
             userId: ctx.session.user.id,
-            weekStart: input.weekStart,
-            weekEnd: input.weekEnd,
+            weekStart,
+            weekEnd,
+            status: null,
           },
           include: {
-            entries: true,
+            entries: {
+              include: {
+                type: true,
+              },
+            },
           },
         });
       }
@@ -35,61 +48,73 @@ export const timesheetRouter = createTRPCRouter({
       return timesheet;
     }),
 
-  saveTimesheet: protectedProcedure
-    .input(z.object({
-      id: z.string(),
-      status: z.string().nullable(),
-      weekStart: z.date(),
-      weekEnd: z.date(),
-    }))
-    .mutation(async ({ ctx, input }) => {
-      return ctx.db.timesheet.upsert({
-        where: {
-          id: input.id,
-        },
-        update: {
-          status: input.status,
-        },
-        create: {
-          userId: ctx.session.user.id,
-          weekStart: input.weekStart,
-          weekEnd: input.weekEnd,
-          status: input.status,
-        },
-        include: {
-          entries: true,
+  getWorkTypes: protectedProcedure
+    .query(async ({ ctx }) => {
+      return ctx.db.workType.findMany({
+        orderBy: {
+          name: 'asc',
         },
       });
     }),
 
-  addEntry: protectedProcedure
+  saveEntry: protectedProcedure
     .input(z.object({
+      id: z.string().optional(),
       timesheetId: z.string(),
       date: z.date(),
-      type: z.string(),
-      projectCode: z.string().optional(),
+      workTypeId: z.string(),
       hours: z.number(),
+      projectCode: z.string().optional().nullable(),
     }))
     .mutation(async ({ ctx, input }) => {
-      // Verify timesheet belongs to user
-      const timesheet = await ctx.db.timesheet.findFirst({
-        where: {
-          id: input.timesheetId,
-          userId: ctx.session.user.id,
-        },
-      });
-
-      if (!timesheet) {
-        throw new Error("Timesheet not found");
+      if (input.id) {
+        return ctx.db.entry.update({
+          where: { id: input.id },
+          data: {
+            date: input.date,
+            workTypeId: input.workTypeId,
+            hours: input.hours,
+            projectCode: input.projectCode,
+          },
+          include: {
+            type: true,
+          },
+        });
       }
 
       return ctx.db.entry.create({
         data: {
           timesheetId: input.timesheetId,
           date: input.date,
-          type: input.type,
-          projectCode: input.projectCode,
+          workTypeId: input.workTypeId,
           hours: input.hours,
+          projectCode: input.projectCode,
+        },
+        include: {
+          type: true,
+        },
+      });
+    }),
+
+  deleteEntry: protectedProcedure
+    .input(z.object({
+      id: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.entry.delete({
+        where: { id: input.id },
+      });
+    }),
+
+  submitTimesheet: protectedProcedure
+    .input(z.object({
+      id: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.timesheet.update({
+        where: { id: input.id },
+        data: {
+          status: 'pending',
         },
       });
     }),

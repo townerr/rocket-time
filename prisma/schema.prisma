@@ -49,16 +49,16 @@ model User {
     lastname      String?
     name          String?
     email         String?   @unique
-    image         String?
-    passwordHash  String?
     emailVerified DateTime?
-    isManager     Boolean   @default(false)
+    image         String?
     managerId     String?
-    sickBalance   Float     @default(40)
-    vacationBalance Float @default(120)
+    manager       User?     @relation("ManagerToEmployee", fields: [managerId], references: [id])
+    employees     User[]    @relation("ManagerToEmployee")
+    isManager     Boolean   @default(false)
     accounts      Account[]
     sessions      Session[]
     timesheets    Timesheet[]
+    balances      Balance?
 }
 
 model VerificationToken {
@@ -98,7 +98,18 @@ model WorkType {
     id        String    @id @default(cuid())
     name      String
     color     String
+    borderColor String  @default("#000000")
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
     entries   Entry[]
+}
+
+model Balance {
+    id        String   @id @default(cuid())
+    userId    String   @unique
+    user      User     @relation(fields: [userId], references: [id])
+    vacation  Float    @default(0)
+    sick      Float    @default(0)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

@@ -22,7 +22,8 @@ import {
   UserCircle,
   Clock,
   History,
-  LogOut
+  LogOut,
+  CogIcon
 } from "lucide-react";
 
 interface NavbarProps {
@@ -75,19 +76,25 @@ export default function Navbar({ session }: NavbarProps) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-white/95 backdrop-blur-sm">
                         <DropdownMenuItem asChild>
-                          <Link href="/approvals" className="flex items-center gap-2">
+                          <Link href="/manager/approvals" className="flex items-center gap-2">
                             <ClipboardCheck className="w-4 h-4" />
                             Approvals
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/employees" className="flex items-center gap-2">
+                          <Link href="/manager/employees" className="flex items-center gap-2">
                             <Users2 className="w-4 h-4" />
                             Employee Management
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/analytics" className="flex items-center gap-2">
+                          <Link href="/manager/settings" className="flex items-center gap-2">
+                            <CogIcon className="w-4 h-4" />
+                            Timesheet Settings
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/manager/analytics" className="flex items-center gap-2">
                             <BarChart2 className="w-4 h-4" />
                             Analytics
                           </Link>
@@ -139,7 +146,7 @@ export default function Navbar({ session }: NavbarProps) {
             <Button 
               asChild 
               variant="outline" 
-              className="border-white text-white hover:bg-white hover:text-indigo-600"
+              className="border-white text-blue-600 hover:text-blue-800"
             >
               <Link href="/api/auth/signin">Sign In</Link>
             </Button>

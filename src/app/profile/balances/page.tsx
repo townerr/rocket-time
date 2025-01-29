@@ -8,28 +8,35 @@ const TOTAL_SICK_HOURS = 40;
 const TOTAL_VACATION_HOURS = 120;
 
 export default function BalancesPage() {
-  const { data, isLoading } = api.profile.getBalances.useQuery();
+  const { data: balanceData, isLoading: balancesLoading } = api.profile.getBalances.useQuery();
+  const { data: leaveHistory, isLoading: historyLoading } = api.profile.getLeaveHistory.useQuery();
+
+  // Transform the data to match LeaveHistoryEntry type
+  const formattedHistory = leaveHistory?.map(entry => ({
+    ...entry,
+    type: entry.type.name,
+  })) ?? [];
 
   return (
     <div className="container mx-auto py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <LeaveBalanceCard
           type="sick"
-          balance={data?.balances?.sickBalance}
+          balance={balanceData?.balances.sick}
           totalHours={TOTAL_SICK_HOURS}
-          isLoading={isLoading}
+          isLoading={balancesLoading}
         />
         <LeaveBalanceCard
           type="vacation"
-          balance={data?.balances?.vacationBalance}
+          balance={balanceData?.balances.vacation}
           totalHours={TOTAL_VACATION_HOURS}
-          isLoading={isLoading}
+          isLoading={balancesLoading}
         />
       </div>
 
       <LeaveHistory
-        history={data?.history ?? []}
-        isLoading={isLoading}
+        history={formattedHistory}
+        isLoading={historyLoading}
       />
     </div>
   );

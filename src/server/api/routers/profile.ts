@@ -57,37 +57,50 @@ export const profileRouter = createTRPCRouter({
       });
     }),
 
-  getBalances: protectedProcedure.query(async ({ ctx }) => {
-    const user = await ctx.db.user.findUnique({
-      where: { id: ctx.session.user.id },
-      select: {
-        sickBalance: true,
-        vacationBalance: true,
-      },
-    });
-
-    const entries = await ctx.db.entry.findMany({
-      where: {
-        timesheet: {
+  getBalances: protectedProcedure
+    .query(async ({ ctx }) => {
+      // Get balances
+      const balances = await ctx.db.balance.findUnique({
+        where: {
           userId: ctx.session.user.id,
         },
-        type: {
-          in: ['Vacation', 'Sick'],
-        },
-      },
-      include: {
-        timesheet: true,
-      },
-      orderBy: {
-        date: 'desc',
-      },
-    });
+      });
 
-    return {
-      balances: user,
-      history: entries,
-    };
-  }),
+      // Get leave history from timesheet entries
+      const history = await ctx.db.entry.findMany({
+        where: {
+          timesheet: {
+            userId: ctx.session.user.id,
+          },
+          type: {
+            name: {
+              in: ['Vacation', 'Sick'],
+            },
+          },
+        },
+        include: {
+          timesheet: true,
+          type: true,
+        },
+        orderBy: {
+          date: 'desc',
+        },
+      });
+
+      // Create default balances if none exist
+      const finalBalances = balances ?? await ctx.db.balance.create({
+        data: {
+          userId: ctx.session.user.id,
+          vacation: 120,
+          sick: 40,
+        },
+      });
+
+      return {
+        balances: finalBalances,
+        history,
+      };
+    }),
 
   getTimesheetHistory: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.timesheet.findMany({
@@ -96,6 +109,9 @@ export const profileRouter = createTRPCRouter({
       },
       include: {
         entries: {
+          include: {
+            type: true,
+          },
           orderBy: {
             date: 'asc',
           },
@@ -106,4 +122,42 @@ export const profileRouter = createTRPCRouter({
       },
     });
   }),
+
+  getLeaveHistory: protectedProcedure
+    .query(async ({ ctx }) => {
+      const leaveEntries = await ctx.db.entry.findMany({
+        where: {
+          timesheet: {
+            userId: ctx.session.user.id,
+          },
+          type: {
+            name: {
+              in: ['Vacation', 'Sick']
+            }
+          }
+        },
+        include: {
+          timesheet: {
+            select: {
+              weekStart: true,
+              weekEnd: true,
+              status: true,
+            }
+          },
+          type: {
+            select: {
+              name: true,
+              color: true,
+            }
+          }
+        },
+        orderBy: [
+          {
+            date: 'desc',
+          }
+        ],
+      });
+
+      return leaveEntries;
+    }),
 }); 

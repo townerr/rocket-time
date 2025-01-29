@@ -1,76 +1,141 @@
-import Link from "next/link";
-import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
-import { RocketHomeIcon } from "~/components/icon";
+"use client";
 
-// TODO: Fix responsiveness of nav and hero section
-// TODO: Change features to be more relevant to RocketTime
+import Link from "next/link";
+import { motion } from "motion/react";
+import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
+import { 
+  Clock, 
+  Calendar, 
+  BarChart3, 
+  Smartphone, 
+  Users, 
+  Rocket,
+  CheckCircle2,
+  ArrowRight
+} from "lucide-react";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-24 px-4 overflow-hidden">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="flex-1 space-y-8">
-              <Badge variant="outline" className="text-sm font-semibold px-4 py-1">
-                🚀 Next-gen Time Tracking
-              </Badge>
-              <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-[#2e026d] to-[#15162c] bg-clip-text text-transparent">
-                Transform Your Workforce Management
-              </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl">
-                RocketTime streamlines employee time tracking, payroll management, and workforce analytics in one powerful platform.
-              </p>
-              <div className="flex gap-4">
-                <Button asChild size="lg">
-                  <Link href="/api/auth/signin">Get Started Free</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link href="#features">Learn More</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="flex-1 flex justify-center">
-              <div className="relative w-full max-w-md aspect-square bg-gradient-to-r from-[#2e026d] to-[#15162c] rounded-full flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#2e026d] to-[#15162c] rounded-full animate-pulse"></div>
-                <div className="relative z-10">
-                  <RocketHomeIcon />
-                </div>
-              </div>
-            </div>
+      <section className="relative pt-32 pb-24 overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          {/* Primary gradient background */}
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-blue-500 opacity-25 dark:opacity-20" />
           </div>
+          
+          {/* Accent gradients */}
+          <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-br from-blue-500 to-indigo-400 blur-3xl opacity-20 dark:opacity-30 animate-pulse" />
+          <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-indigo-500 to-blue-500 blur-3xl opacity-20 dark:opacity-30 animate-pulse delay-300" />
+        </div>
+        
+        <div className="container px-4 mx-auto">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-4xl mx-auto"
+          >
+            <Badge variant="outline" className="mb-8 text-sm font-medium px-6 py-2 bg-white/90 backdrop-blur-sm dark:bg-zinc-900/90">
+              <Rocket className="w-4 h-4 mr-2" />
+              Welcome to RocketTime
+            </Badge>
+            
+            <h1 className="text-5xl md:text-6xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500 dark:from-indigo-400 dark:to-blue-300">
+              Time Management Made Simple
+            </h1>
+            
+            <p className="text-xl text-zinc-700 dark:text-zinc-300 mb-12 max-w-2xl mx-auto">
+              Streamline your workforce management with our intuitive timesheet solution. Track time, manage leave, and boost productivity all in one place.
+            </p>
+
+            <motion.div 
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 1 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-500 hover:to-blue-400">
+                <Link href="/api/auth/signin" className="flex items-center">
+                  Get Started
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-muted/50">
-        <div className="container mx-auto max-w-6xl px-4">
-          <h2 className="text-4xl font-bold text-center mb-16">Powerful Features</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {FEATURES.map((feature) => (
-              <Card key={feature.title} className="p-6 hover:shadow-lg transition-shadow">
-                <feature.icon className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </Card>
+      <section className="py-24 bg-white dark:bg-zinc-900">
+        <div className="container px-4 mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Everything You Need</h2>
+            <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
+              Powerful features designed to make time tracking and management effortless
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {FEATURES.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="relative group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950 dark:to-blue-950 rounded-2xl transform transition-transform group-hover:scale-105" />
+                <div className="relative p-8 space-y-4">
+                  <feature.icon className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+                  <h3 className="text-xl font-semibold">{feature.title}</h3>
+                  <p className="text-zinc-600 dark:text-zinc-400">{feature.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-24 bg-gradient-to-r from-indigo-600 to-blue-500">
+        <div className="container px-4 mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-white text-center">
+            {STATS.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className="text-4xl font-bold mb-2">{stat.value}</div>
+                <div className="text-indigo-100">{stat.label}</div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20">
-        <div className="container mx-auto max-w-4xl text-center px-4">
-          <h2 className="text-4xl font-bold mb-6">Ready to Launch Your Productivity?</h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of teams already revolutionizing their workforce management with RocketTime.
-          </p>
-          <Button asChild size="lg" className="text-lg px-8 py-6">
-            <Link href="/api/auth/signin">Start Your Free Trial Now</Link>
-          </Button>
+      <section className="py-24 bg-white dark:bg-zinc-900">
+        <div className="container px-4 mx-auto text-center">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold mb-8">Ready to Transform Your Workforce?</h2>
+            <p className="text-xl text-zinc-600 dark:text-zinc-400 mb-12">
+              Join thousands of companies already using RocketTime to streamline their time management.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-500 hover:to-blue-400">
+                <Link href="/api/auth/signin" className="flex items-center">
+                  Get Started
+                  <CheckCircle2 className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -79,162 +144,40 @@ export default function Home() {
 
 const FEATURES = [
   {
-    title: "Real-time Tracking",
-    description: "Monitor employee hours with GPS verification and live updates",
-    icon: ClockIcon,
+    title: "Smart Time Tracking",
+    description: "Effortlessly track time with our intuitive interface and automated suggestions.",
+    icon: Clock,
   },
   {
-    title: "Smart Scheduling",
-    description: "Automated shift planning with conflict detection and notifications",
-    icon: CalendarIcon,
+    title: "Leave Management",
+    description: "Streamline vacation and sick leave requests with automated approval workflows.",
+    icon: Calendar,
   },
   {
-    title: "Payroll Integration",
-    description: "Seamless integration with popular payroll systems",
-    icon: WalletIcon,
+    title: "Real-time Analytics",
+    description: "Get instant insights into workforce productivity and project time allocation.",
+    icon: BarChart3,
   },
   {
-    title: "Advanced Analytics",
-    description: "Detailed reports and workforce insights",
-    icon: ChartIcon,
+    title: "Mobile Access",
+    description: "Track time and manage requests on the go with our mobile app.",
+    icon: Smartphone,
   },
   {
-    title: "Mobile App",
-    description: "Full functionality on iOS and Android devices",
-    icon: MobileIcon,
+    title: "Team Management",
+    description: "Easily manage teams, departments, and approval hierarchies.",
+    icon: Users,
   },
   {
-    title: "24/7 Support",
-    description: "Dedicated support team always ready to help",
-    icon: SupportIcon,
+    title: "Automated Reports",
+    description: "Generate detailed reports for payroll, billing, and compliance.",
+    icon: Rocket,
   },
 ];
 
-function ClockIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
-}
-
-function CalendarIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-      <line x1="16" x2="16" y1="2" y2="6" />
-      <line x1="8" x2="8" y1="2" y2="6" />
-      <line x1="3" x2="21" y1="10" y2="10" />
-    </svg>
-  );
-}
-
-function WalletIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-    </svg>
-  );
-}
-
-function ChartIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 3v18h18" />
-      <path d="M18 17V9" />
-      <path d="M13 17V5" />
-      <path d="M8 17v-3" />
-    </svg>
-  );
-}
-
-function MobileIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
-      <path d="M12 18h.01" />
-    </svg>
-  );
-}
-
-function SupportIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14 9c0 .6-.4 1-1 1H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9c.6 0 1 .4 1 1Z" />
-      <path d="M18 6h4" />
-      <path d="M18 10h4" />
-      <path d="M6 18a2 2 0 0 1-2-2v-1c0-.6.4-1 1-1h9c.6 0 1 .4 1 1v3c0 .6-.4 1-1 1Z" />
-      <path d="M22 16h-4" />
-      <path d="M22 20h-4" />
-    </svg>
-  );
-}
+const STATS = [
+  { value: "10K+", label: "Active Users" },
+  { value: "5M+", label: "Hours Tracked" },
+  { value: "99.9%", label: "Uptime" },
+  { value: "24/7", label: "Support" },
+];

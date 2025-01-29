@@ -14,16 +14,35 @@ import { Avatar, AvatarImage } from "~/components/ui/avatar";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "~/components/ui/navigation-menu";
 import { RocketIcon } from "~/components/icon";
 import { cn } from "~/lib/utils";
-import { ChevronDown } from "lucide-react";
+import { 
+  ChevronDown,
+  ClipboardCheck,
+  Users2,
+  BarChart2,
+  UserCircle,
+  Clock,
+  History,
+  LogOut
+} from "lucide-react";
 
-export default function Navbar({ session }: { session: { user?: User } | null }) {
+interface NavbarProps {
+  session: {
+    user?: User & {
+      isManager?: boolean;
+    };
+  } | null;
+}
+
+export default function Navbar({ session }: NavbarProps) {
   return (
-    <nav className="bg-black shadow-sm sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 to-blue-500 shadow-lg">
       <div className="container flex h-16 items-center justify-between px-4 mx-auto">
         {/* Left side - Logo */}
         <Link href="/" className="flex items-center gap-2">
           <RocketIcon />
-          <span className="font-bold text-lg text-white hover:underline transition-colors duration-300">RocketTime</span>
+          <span className="font-bold text-lg text-white hover:text-indigo-100 transition-colors duration-300">
+            RocketTime
+          </span>
         </Link>
 
         {/* Right side - Navigation */}
@@ -35,63 +54,93 @@ export default function Navbar({ session }: { session: { user?: User } | null })
                   <NavigationMenuItem>
                     <Link href="/timesheet" legacyBehavior passHref>
                       <NavigationMenuLink className={cn(
-                        "text-sm text-white font-medium transition-colors hover:text-black", "hover:bg-accent", "rounded-md px-3.5 py-2.5"
+                        "text-sm text-white font-medium transition-colors",
+                        "hover:bg-white/10",
+                        "rounded-md px-3.5 py-2.5"
                       )}>
                         Timesheet
                       </NavigationMenuLink>
                     </Link>
                   </NavigationMenuItem>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="text-white">
-                        Manager <ChevronDown className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem asChild>
-                        <Link href="/approvals">Approvals</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/employees">Employee Management</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/analytics">Analytics</Link>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {session.user.isManager && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          className="text-white hover:bg-white/10 hover:text-white"
+                        >
+                          Manager <ChevronDown className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="bg-white/95 backdrop-blur-sm">
+                        <DropdownMenuItem asChild>
+                          <Link href="/approvals" className="flex items-center gap-2">
+                            <ClipboardCheck className="w-4 h-4" />
+                            Approvals
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/employees" className="flex items-center gap-2">
+                            <Users2 className="w-4 h-4" />
+                            Employee Management
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/analytics" className="flex items-center gap-2">
+                            <BarChart2 className="w-4 h-4" />
+                            Analytics
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </NavigationMenuList>
               </NavigationMenu>
 
               {/* User dropdown */}
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1">
-                  <Avatar className="h-8 w-8">
+                <DropdownMenuTrigger className="flex items-center gap-1 hover:opacity-80 transition-opacity">
+                  <Avatar className="h-8 w-8 ring-2 ring-white/20">
                     <AvatarImage src={session.user.image ?? undefined} />
                   </Avatar>
-                  <ChevronDown className="text-white w-4 h-4 hover:animate-pulse" />
+                  <ChevronDown className="text-white w-4 h-4" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className="bg-white/95 backdrop-blur-sm">
                   <DropdownMenuItem asChild>
-                    <Link href="/profile">Profile</Link>
+                    <Link href="/profile" className="flex items-center gap-2">
+                      <UserCircle className="w-4 h-4" />
+                      Profile
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile/balances">Balances</Link>
+                    <Link href="/profile/balances" className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Balances
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile/history">History</Link>
+                    <Link href="/profile/history" className="flex items-center gap-2">
+                      <History className="w-4 h-4" />
+                      History
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => signOut({ callbackUrl: "/" })}
-                    className="text-destructive focus:bg-destructive/10"
+                    className="text-red-600 focus:text-red-600 focus:bg-red-50 flex items-center gap-2"
                   >
+                    <LogOut className="w-4 h-4" />
                     Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
           ) : (
-            <Button asChild variant="default">
+            <Button 
+              asChild 
+              variant="outline" 
+              className="border-white text-white hover:bg-white hover:text-indigo-600"
+            >
               <Link href="/api/auth/signin">Sign In</Link>
             </Button>
           )}

@@ -18,8 +18,15 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Input } from "~/components/ui/input";
-import { PlusCircle, Trash2, Pencil } from "lucide-react";
+import { PlusCircle, Trash2, Pencil, Clock, MoreHorizontal } from "lucide-react";
 import type { Timesheet, Entry, WorkType } from "@prisma/client";
+import { Badge } from "~/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 
 interface TimesheetTableProps {
   timesheet: (Timesheet & {
@@ -69,50 +76,62 @@ export function TimesheetTable({
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center py-10">Loading...</div>;
   }
 
   return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-4">
+    <div className="w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-3 mb-4">
         {weekDays.map((date) => (
           <div
             key={date.toISOString()}
-            className="border rounded-lg p-4 space-y-4"
+            className="border rounded-lg overflow-hidden bg-white dark:bg-gray-900 shadow-sm"
           >
-            <div className="text-center">
+            <div className="text-center py-2 bg-gray-50 dark:bg-gray-800 border-b">
               <div className="font-medium">{format(date, "EEEE")}</div>
               <div className="text-sm text-muted-foreground">
                 {format(date, "MMM d")}
               </div>
             </div>
 
-            <div className="space-y-2">
-              {getDayEntries(date).map((entry) => (
-                <DayEntry
-                  key={entry.id}
-                  entry={entry}
-                  workTypes={workTypes}
-                  onSave={onSave}
-                  onDelete={onDelete}
-                />
-              ))}
+            <div className="p-3 space-y-3">
+              {getDayEntries(date).length > 0 ? (
+                getDayEntries(date).map((entry) => (
+                  <DayEntry
+                    key={entry.id}
+                    entry={entry}
+                    workTypes={workTypes}
+                    onSave={onSave}
+                    onDelete={onDelete}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-6 text-sm text-muted-foreground">
+                  No entries
+                </div>
+              )}
             </div>
 
-            <AddEntryDialog
-              date={date}
-              workTypes={workTypes}
-              onSave={onSave}
-            />
+            <div className="px-3 pb-3">
+              <AddEntryDialog
+                date={date}
+                workTypes={workTypes}
+                onSave={onSave}
+              />
+            </div>
 
-            <div className="text-sm text-right pt-2 border-t">
-              Total: {getDayTotal(date)} hours
+            <div className="flex justify-between items-center p-3 border-t bg-gray-50 dark:bg-gray-800">
+              <span className="text-sm text-muted-foreground">Total</span>
+              <div className="flex items-center font-medium">
+                <Clock className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                {getDayTotal(date)}h
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="text-right font-medium">
+      <div className="text-right font-semibold p-3 border-t">
         Week Total: {getWeekTotal()} hours
       </div>
     </div>
@@ -140,55 +159,83 @@ function getContrastColor(hexcolor: string) {
 }
 
 function DayEntry({ entry, workTypes, onSave, onDelete }: DayEntryProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const contrastColor = getContrastColor(entry.type.color);
 
   return (
-    <div
-      className="p-2 rounded text-sm space-y-1"
-      style={{ 
-        backgroundColor: entry.type.color,
-        border: `1px solid ${entry.type.borderColor}`,
-        color: getContrastColor(entry.type.color),
-      }}
-    >
-      <div className="flex justify-between items-center">
-        <span className="font-medium truncate" title={entry.type.name}>{entry.type.name}</span>
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            className="h-6 w-6 p-0 bg-blue-500/50 hover:bg-blue-500/70"
-            onClick={() => setIsEditing(true)}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            size="sm"
-            className="h-6 w-6 p-0 text-destructive bg-red-500/40 hover:bg-red-500/60"
-            onClick={() => onDelete(entry.id)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+    <div className="w-full">
+      <div
+        className="rounded-md shadow-sm overflow-hidden"
+        style={{ 
+          backgroundColor: entry.type.color,
+          border: `1px solid ${entry.type.borderColor}`,
+          color: contrastColor,
+        }}
+      >
+        <div className="px-3 py-2">
+          <div className="flex justify-between items-start">
+            <div>
+              <div className="font-medium pr-2">{entry.type.name}</div>
+              <div className="mt-1 flex items-center">
+                <Clock className="h-3.5 w-3.5 mr-1 opacity-75" />
+                <span className="font-semibold">{entry.hours}h</span>
+              </div>
+            </div>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 w-6 p-0 rounded-full hover:bg-black/10 mt-0.5"
+                  style={{ color: contrastColor }}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => onDelete(entry.id)}
+                  className="text-destructive"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          
+          {entry.projectCode && (
+            <div 
+              className="mt-2 px-2 py-1 rounded-sm text-xs"
+              style={{ backgroundColor: `${contrastColor === '#000000' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.15)'}` }}
+            >
+              <span className="opacity-70">Project:</span> {entry.projectCode}
+            </div>
+          )}
         </div>
       </div>
-      {entry.projectCode && (
-        <div className="text-xs px-2 py-1 bg-black/5 rounded truncate" title={entry.projectCode}>
-          {entry.projectCode}
-        </div>
-      )}
-      <div>{entry.hours} hours</div>
 
-      {isEditing && (
-        <EntryForm
-          entry={entry}
-          date={entry.date}
-          workTypes={workTypes}
-          onSave={(values) => {
-            onSave({ id: entry.id, ...values });
-            setIsEditing(false);
-          }}
-          onCancel={() => setIsEditing(false)}
-        />
-      )}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Time Entry</DialogTitle>
+          </DialogHeader>
+          <EntryForm
+            entry={entry}
+            date={entry.date}
+            workTypes={workTypes}
+            onSave={(values) => {
+              onSave({ id: entry.id, ...values });
+              setEditDialogOpen(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -205,9 +252,9 @@ function AddEntryDialog({ date, workTypes, onSave }: AddEntryDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="w-full bg-gray-100 hover:bg-gray-200 text-purple-300">
-          <PlusCircle className="h-4 w-4 mr-2" />
-          Add Entry
+        <Button variant="outline" className="w-full flex items-center gap-1">
+          <PlusCircle className="h-4 w-4" />
+          <span>Add Entry</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -237,10 +284,9 @@ interface EntryFormProps {
     hours: number;
     projectCode?: string | null;
   }) => void;
-  onCancel?: () => void;
 }
 
-function EntryForm({ entry, date, workTypes, onSave, onCancel }: EntryFormProps) {
+function EntryForm({ entry, date, workTypes, onSave }: EntryFormProps) {
   const [workTypeId, setWorkTypeId] = useState(entry?.workTypeId ?? "");
   const [projectCode, setProjectCode] = useState(entry?.projectCode ?? "");
   const [hours, setHours] = useState(entry?.hours.toString() ?? "");
@@ -292,14 +338,7 @@ function EntryForm({ entry, date, workTypes, onSave, onCancel }: EntryFormProps)
         onChange={(e) => setHours(e.target.value)}
       />
 
-      <div className="flex flex-col justify-end gap-2">
-        {onCancel && (
-          <Button variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-        )}
-        <Button onClick={handleSave}>Save Entry</Button>
-      </div>
+      <Button onClick={handleSave} className="w-full">Save Entry</Button>
     </div>
   );
 } 

@@ -12,6 +12,8 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { EmployeeRow } from "./employee-row";
+import { useState, useEffect } from "react";
+import { api } from "~/trpc/react";
 
 interface EmployeeListProps {
   employees: User[];
@@ -20,7 +22,21 @@ interface EmployeeListProps {
 }
 
 export function EmployeeList({ employees, searchQuery, onSearchChange }: EmployeeListProps) {
-  const filteredEmployees = employees?.filter(employee => 
+  // Add state for employees to handle updates
+  const [employeeList, setEmployeeList] = useState<User[]>(employees);
+  const utils = api.useContext();
+
+  // Refresh employee data after status changes
+  const handleStatusChange = () => {
+    void utils.manager.getEmployees.invalidate();
+  };
+
+  // Update employee list when props change
+  useEffect(() => {
+    setEmployeeList(employees);
+  }, [employees]);
+
+  const filteredEmployees = employeeList?.filter(employee => 
     employee.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     employee.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -50,7 +66,11 @@ export function EmployeeList({ employees, searchQuery, onSearchChange }: Employe
           </TableHeader>
           <TableBody>
             {filteredEmployees?.map((employee) => (
-              <EmployeeRow key={employee.id} employee={employee} />
+              <EmployeeRow 
+                key={employee.id} 
+                employee={employee}
+                onStatusChange={handleStatusChange}
+              />
             ))}
           </TableBody>
         </Table>

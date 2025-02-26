@@ -55,6 +55,7 @@ model User {
     manager       User?     @relation("ManagerToEmployee", fields: [managerId], references: [id])
     employees     User[]    @relation("ManagerToEmployee")
     isManager     Boolean   @default(false)
+    status        String    @default("active") // Can be "active", "inactive", or "terminated"
     accounts      Account[]
     sessions      Session[]
     timesheets    Timesheet[]

@@ -12,16 +12,58 @@ import {
   CardFooter
 } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
-import { WeekPicker } from '~/components/week-picker'
-import { TimesheetTable } from '~/components/timesheet-table'
+import { WeekPicker } from '~/components/timesheet/widgets/WeekPicker'
+import { TimesheetTable } from '~/components/timesheet/TimesheetTable'
 import { useToast } from '~/hooks/use-toast'
 import { startOfWeek, format, addDays, endOfWeek } from 'date-fns'
 import { CalendarIcon, ClockIcon, CheckIcon, AlertCircleIcon } from 'lucide-react'
+import { type TimesheetEntryData, TimesheetPageProps } from '~/components/timesheet/utils/types'
 
-export default function TimesheetPage() {
+// Component for loading state
+const TimesheetSkeleton = () => (
+  <div className="space-y-4">
+    <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
+    <div className="h-[400px] bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+  </div>
+);
+
+// Component for week summary
+const WeekSummary = ({ weekHours }: { weekHours: number }) => (
+  <div className="flex items-center space-x-2 text-sm">
+    <ClockIcon className="h-4 w-4 text-muted-foreground" />
+    <span className="font-medium">{weekHours.toFixed(1)}</span>
+    <span className="text-muted-foreground">hours this week</span>
+  </div>
+);
+
+// Component for action buttons
+const ActionButtons = ({ 
+  onSubmit, 
+  isSubmitting, 
+  canSubmit 
+}: { 
+  onSubmit: () => void; 
+  isSubmitting: boolean;
+  canSubmit: boolean;
+}) => (
+  <div className="flex justify-end space-x-4">
+    <Button
+      variant="default"
+      onClick={onSubmit}
+      disabled={isSubmitting || !canSubmit}
+      className="flex items-center space-x-2"
+    >
+      <CheckIcon className="h-4 w-4" />
+      <span>Submit Timesheet</span>
+    </Button>
+  </div>
+);
+
+export default function TimesheetPage({}: TimesheetPageProps) {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const router = useRouter()
   const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 })
   const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 })
@@ -48,8 +90,14 @@ export default function TimesheetPage() {
         title: 'Entry saved',
         description: 'Your timesheet entry has been saved successfully.',
       });
-      // Invalidate the current timesheet query to refresh data
-      utils.timesheet.getCurrentTimesheet.invalidate({ weekStart });
+      void utils.timesheet.getCurrentTimesheet.invalidate({ weekStart });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error saving entry',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
 
@@ -59,30 +107,43 @@ export default function TimesheetPage() {
         title: 'Entry deleted',
         description: 'Your timesheet entry has been deleted successfully.',
       });
-      // Invalidate the current timesheet query to refresh data
-      utils.timesheet.getCurrentTimesheet.invalidate({ weekStart });
+      void utils.timesheet.getCurrentTimesheet.invalidate({ weekStart });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error deleting entry',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
 
   const { mutate: submitTimesheet } = api.timesheet.submitTimesheet.useMutation({
     onSuccess: () => {
+      setIsSubmitting(false);
       toast({
         title: 'Timesheet submitted',
-        description: 'Your timesheet has been submitted for approval.',
-      })
-      router.push('/profile/history')
+        description: 'Your timesheet has been submitted successfully.',
+      });
+      void utils.timesheet.getCurrentTimesheet.invalidate({ weekStart });
     },
-  })
+    onError: (error) => {
+      setIsSubmitting(false);
+      toast({
+        title: 'Error submitting timesheet',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
-  const handleSave = (entry: {
-    id?: string
-    date: Date
-    workTypeId: string
-    hours: number
-    projectCode?: string | null
-  }) => {
-    if (!timesheet) return
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+  };
 
+  const handleSave = (entry: TimesheetEntryData) => {
+    if (!timesheet) return;
+    
     saveEntry({
       id: entry.id,
       timesheetId: timesheet.id,
@@ -90,141 +151,90 @@ export default function TimesheetPage() {
       workTypeId: entry.workTypeId,
       hours: entry.hours,
       projectCode: entry.projectCode,
-    })
-  }
+    });
+  };
 
   const handleDelete = (entryId: string) => {
-    deleteEntry({ id: entryId })
-  }
+    deleteEntry({ id: entryId });
+  };
 
   const handleSubmit = () => {
-    if (!timesheet) return
-    submitTimesheet({ id: timesheet.id })
-  }
+    if (!timesheet) return;
+    setIsSubmitting(true);
+    submitTimesheet({ id: timesheet.id });
+  };
 
-  const isLoading = timesheetLoading || workTypesLoading
-  
   // Calculate total hours for the week
-  const totalHours = timesheet?.entries.reduce((acc, entry) => acc + entry.hours, 0) || 0
+  const weekHours = timesheet?.entries.reduce((acc, entry) => acc + entry.hours, 0) || 0;
+  
+  // Check if the timesheet has been submitted
+  const isSubmitted = timesheet?.status === 'pending';
+  
+  // Check if timesheet can be submitted
+  const canSubmit = timesheet && !isSubmitted && (timesheet.entries.length > 0);
+
+  const isLoading = timesheetLoading || workTypesLoading;
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      {/* Page Header */}
-      <div className="mb-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Weekly Timesheet</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center">
-              <CalendarIcon className="h-4 w-4 mr-2" />
-              {formattedDateRange}
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            <WeekPicker
-              value={selectedDate}
-              onChange={setSelectedDate}
+    <div className="container mx-auto py-6 max-w-7xl">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
+            <div>
+              <CardTitle>Weekly Timesheet</CardTitle>
+              <CardDescription>Record your hours for the week</CardDescription>
+            </div>
+            <WeekPicker 
+              value={selectedDate} 
+              onChange={handleDateChange} 
             />
           </div>
-        </div>
-      </div>
-      
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-center">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</p>
-                <p className="text-xl font-semibold">
-                  {timesheet?.status ? 'Submitted' : 'Draft'}
-                </p>
+          
+          <div className="flex items-center mt-4 text-sm">
+            <CalendarIcon className="h-4 w-4 mr-2 text-muted-foreground" />
+            {formattedDateRange}
+            {isSubmitted && (
+              <div className="ml-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400">
+                Submitted
               </div>
-              <div className={`p-2 rounded-full ${
-                timesheet?.status ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
-              }`}>
-                {timesheet?.status ? (
-                  <CheckIcon className="h-5 w-5" />
-                ) : (
-                  <AlertCircleIcon className="h-5 w-5" />
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-center">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Hours</p>
-                <p className="text-xl font-semibold">{totalHours} hours</p>
-              </div>
-              <div className="p-2 rounded-full bg-indigo-100 text-indigo-800">
-                <ClockIcon className="h-5 w-5" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-center">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Entries</p>
-                <p className="text-xl font-semibold">{timesheet?.entries.length || 0}</p>
-              </div>
-              <div className="p-2 rounded-full bg-emerald-100 text-emerald-800">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Timesheet Section */}
-      <Card className="mb-6">
-        <CardHeader className="pb-0">
-          <CardTitle>Time Entries</CardTitle>
-          <CardDescription>Record your daily work activities</CardDescription>
+            )}
+          </div>
         </CardHeader>
+        
         <CardContent>
-          <TimesheetTable
-            timesheet={timesheet}
-            workTypes={workTypes ?? []}
-            isLoading={isLoading}
-            onSave={handleSave}
-            onDelete={handleDelete}
-          />
+          {isLoading ? (
+            <TimesheetSkeleton />
+          ) : (
+            <>
+              <TimesheetTable
+                timesheet={timesheet}
+                workTypes={workTypes || []}
+                isLoading={isLoading}
+                onSave={handleSave}
+                onDelete={handleDelete}
+              />
+            
+              {!timesheet?.entries.length && (
+                <div className="text-center p-8 text-muted-foreground">
+                  <p>No timesheet entries for this week yet. Add your first entry.</p>
+                </div>
+              )}
+            </>
+          )}
         </CardContent>
         
-        {timesheet && !timesheet.status && (
-          <CardFooter className="border-t pt-6 flex justify-end">
-            <Button 
-              onClick={handleSubmit}
-              disabled={timesheet.entries.length === 0}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Submit for Approval
-            </Button>
-          </CardFooter>
-        )}
+        <CardFooter className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+          <WeekSummary weekHours={weekHours} />
+          
+          {timesheet && !isSubmitted && (
+            <ActionButtons 
+              onSubmit={handleSubmit} 
+              isSubmitting={isSubmitting}
+              canSubmit={!!canSubmit}
+            />
+          )}
+        </CardFooter>
       </Card>
-      
-      {timesheet && timesheet.status && (
-        <Card className="bg-amber-50 border-amber-200">
-          <CardContent className="p-4">
-            <div className="flex items-center text-amber-800">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p>This timesheet has been submitted for approval and cannot be edited.</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }

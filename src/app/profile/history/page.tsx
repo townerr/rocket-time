@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "~/trpc/react";
-import { TimesheetHistory } from "~/components/timesheet-history";
+import { TimesheetHistory } from "~/components/timesheet/TimesheetHistory";
 
 export default function HistoryPage() {
   const { data: timesheets, isLoading } = api.profile.getTimesheetHistory.useQuery();

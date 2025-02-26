@@ -12,7 +12,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { Avatar, AvatarImage } from "~/components/ui/avatar";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "~/components/ui/navigation-menu";
-import { RocketIcon } from "~/components/icon";
+import { RocketIcon } from "~/components/ui/Icon";
 import { cn } from "~/lib/utils";
 import { 
   ChevronDown,
@@ -34,7 +34,7 @@ interface NavbarProps {
   } | null;
 }
 
-export default function Navbar({ session }: NavbarProps) {
+export function Navbar({ session }: NavbarProps) {
   return (
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 to-blue-500 shadow-lg">
       <div className="container flex h-16 items-center justify-between px-4 mx-auto">
@@ -155,4 +155,4 @@ export default function Navbar({ session }: NavbarProps) {
       </div>
     </nav>
   );
-}
+} 

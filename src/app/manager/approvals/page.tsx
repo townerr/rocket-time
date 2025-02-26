@@ -15,26 +15,184 @@ import {
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { format } from "date-fns";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, User, Calendar, Clock } from "lucide-react";
 import { useToast } from "~/hooks/use-toast";
 import type { Timesheet, Entry, WorkType } from "@prisma/client";
 
-// Define types for our timesheets
+// Define types for our data
 type TimesheetWithEntries = Timesheet & {
   entries: Entry[];
+  employeeName?: string;
+  status?: string | null;
+  submitted?: boolean;
+  approved?: boolean;
+  rejected?: boolean;
+  user?: {
+    id: string;
+    name: string | null;
+  };
+};
+
+type Employee = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+type TimesheetStatus = "draft" | "pending" | "approved" | "rejected";
+
+// Function to format date ranges
+const formatDateRange = (startDate: Date) => {
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + 6);
+  return `${format(startDate, "MMM d")} - ${format(endDate, "MMM d, yyyy")}`;
+};
+
+// Component for status badge
+const StatusBadge = ({ status }: { status: TimesheetStatus }) => {
+  const statusConfig = {
+    draft: { label: "Draft", className: "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300" },
+    pending: { label: "Pending Approval", className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500" },
+    approved: { label: "Approved", className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-500" },
+    rejected: { label: "Rejected", className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-500" },
+  };
+
+  const config = statusConfig[status];
+  return (
+    <Badge className={config.className}>
+      {config.label}
+    </Badge>
+  );
+};
+
+// Helper to determine timesheet status
+const getTimesheetStatus = (timesheet: TimesheetWithEntries): TimesheetStatus => {
+  if (timesheet.submitted === false || timesheet.status === "draft" || !timesheet.status) return "draft";
+  if (timesheet.approved || timesheet.status === "approved") return "approved";
+  if (timesheet.rejected || timesheet.status === "rejected") return "rejected";
+  return "pending";
+};
+
+// Component for the timesheet table
+const TimesheetsTable = ({ 
+  timesheets, 
+  status,
+  onApprove,
+  onReject
+}: { 
+  timesheets: TimesheetWithEntries[]; 
+  status: TimesheetStatus;
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
+}) => {
+  const filteredTimesheets = timesheets.filter(timesheet => {
+    const timesheetStatus = getTimesheetStatus(timesheet);
+    return timesheetStatus === status;
+  });
+
+  if (filteredTimesheets.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        No timesheets found with {status} status.
+      </div>
+    );
+  }
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[180px]">Employee</TableHead>
+          <TableHead>Period</TableHead>
+          <TableHead>Hours</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {filteredTimesheets.map((timesheet) => {
+          // Calculate total hours
+          const totalHours = timesheet.entries.reduce(
+            (acc, entry) => acc + entry.hours,
+            0
+          );
+
+          // Get timesheet status
+          const timesheetStatus = getTimesheetStatus(timesheet);
+
+          return (
+            <TableRow key={timesheet.id}>
+              <TableCell className="font-medium">
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-gray-500" />
+                  <span>{timesheet.employeeName || "Unknown Employee"}</span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <span>{formatDateRange(timesheet.weekStart)}</span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-gray-500" />
+                  <span>{totalHours.toFixed(1)}</span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <StatusBadge status={timesheetStatus} />
+              </TableCell>
+              <TableCell className="text-right">
+                {timesheetStatus === "pending" && (
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onApprove(timesheet.id)}
+                      className="text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700 dark:border-green-900 dark:hover:bg-green-900/20"
+                    >
+                      <CheckCircle className="mr-1 h-4 w-4" />
+                      Approve
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onReject(timesheet.id)}
+                      className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:hover:bg-red-900/20"
+                    >
+                      <XCircle className="mr-1 h-4 w-4" />
+                      Reject
+                    </Button>
+                  </div>
+                )}
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
+  );
 };
 
 export default function ApprovalsPage() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("draft");
+  const [activeTab, setActiveTab] = useState<TimesheetStatus>("pending");
   
   const { data: employees, isLoading: employeesLoading } = api.manager.getEmployees.useQuery();
   
-  // Prefetch all employee timesheets
-  const { data: timesheets, isLoading: timesheetsLoading, refetch: refetchTimesheets } = 
-    api.manager.getAllEmployeeTimesheets.useQuery(undefined, {
-      enabled: !!employees,
-    });
+  // Fetch all employee timesheets
+  const { 
+    data: timesheets = [], 
+    isLoading: timesheetsLoading, 
+    refetch: refetchTimesheets 
+  } = api.manager.getAllEmployeeTimesheets.useQuery(undefined, {
+    enabled: !!employees,
+    select: (data) => data.map(timesheet => ({
+      ...timesheet,
+      employeeName: timesheet.user?.name || 'Unknown Employee'
+    })) as TimesheetWithEntries[]
+  });
   
   const approveTimesheet = api.manager.approveTimesheet.useMutation({
     onSuccess: () => {
@@ -44,6 +202,13 @@ export default function ApprovalsPage() {
       });
       void refetchTimesheets();
     },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   });
 
   const rejectTimesheet = api.manager.rejectTimesheet.useMutation({
@@ -54,16 +219,14 @@ export default function ApprovalsPage() {
       });
       void refetchTimesheets();
     },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   });
-
-  // Filter timesheets by status
-  const draftTimesheets = timesheets?.filter(
-    (timesheet: TimesheetWithEntries) => timesheet.status === "pending"
-  ) || [];
-  
-  const approvedTimesheets = timesheets?.filter(
-    (timesheet: TimesheetWithEntries) => timesheet.status === "approved"
-  ) || [];
 
   const handleApprove = (timesheetId: string) => {
     approveTimesheet.mutate({ timesheetId });
@@ -73,146 +236,68 @@ export default function ApprovalsPage() {
     rejectTimesheet.mutate({ timesheetId });
   };
 
-  if (employeesLoading || timesheetsLoading) {
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold">Timesheet Approvals</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-96 flex items-center justify-center">
-              <div className="text-center">
-                <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p>Loading timesheets...</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const isLoading = employeesLoading || timesheetsLoading;
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Timesheet Approvals</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="draft" value={activeTab} onValueChange={setActiveTab}>
+    <Card className="max-w-5xl mx-auto">
+      <CardHeader>
+        <CardTitle>Timesheet Approvals</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-pulse space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-64 dark:bg-gray-700"></div>
+              <div className="h-40 bg-gray-200 rounded dark:bg-gray-700"></div>
+            </div>
+          </div>
+        ) : (
+          <Tabs defaultValue="pending" value={activeTab} onValueChange={(value) => setActiveTab(value as TimesheetStatus)}>
             <TabsList className="mb-4">
-              <TabsTrigger value="draft">
-                Pending Approval
-                {draftTimesheets.length > 0 && (
-                  <Badge className="ml-2" variant="secondary">
-                    {draftTimesheets.length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="approved">
-                Approved
-                {approvedTimesheets.length > 0 && (
-                  <Badge className="ml-2" variant="secondary">
-                    {approvedTimesheets.length}
-                  </Badge>
-                )}
-              </TabsTrigger>
+              <TabsTrigger value="pending">Pending Approval</TabsTrigger>
+              <TabsTrigger value="approved">Approved</TabsTrigger>
+              <TabsTrigger value="rejected">Rejected</TabsTrigger>
+              <TabsTrigger value="draft">Drafts</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="draft" className="space-y-4">
-              {draftTimesheets.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No timesheets pending approval
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Employee</TableHead>
-                      <TableHead>Week</TableHead>
-                      <TableHead className="text-right">Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {draftTimesheets.map((timesheet: TimesheetWithEntries) => (
-                      <TableRow key={timesheet.id}>
-                        <TableCell className="font-medium">
-                          {employees?.find(emp => emp.id === timesheet.userId)?.name || "Unknown"}
-                        </TableCell>
-                        <TableCell>
-                          {format(new Date(timesheet.weekStart), "MMM d")} - {format(new Date(timesheet.weekEnd), "MMM d, yyyy")}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="secondary">Pending</Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 gap-1"
-                              onClick={() => handleApprove(timesheet.id)}
-                              disabled={approveTimesheet.isPending}
-                            >
-                              <CheckCircle className="h-4 w-4" />
-                              Approve
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 gap-1 text-destructive hover:text-destructive"
-                              onClick={() => handleReject(timesheet.id)}
-                              disabled={rejectTimesheet.isPending}
-                            >
-                              <XCircle className="h-4 w-4" />
-                              Reject
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+            <TabsContent value="pending">
+              <TimesheetsTable 
+                timesheets={timesheets} 
+                status="pending" 
+                onApprove={handleApprove}
+                onReject={handleReject}
+              />
             </TabsContent>
             
-            <TabsContent value="approved" className="space-y-4">
-              {approvedTimesheets.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No approved timesheets
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Employee</TableHead>
-                      <TableHead>Week</TableHead>
-                      <TableHead className="text-right">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {approvedTimesheets.map((timesheet: TimesheetWithEntries) => (
-                      <TableRow key={timesheet.id}>
-                        <TableCell className="font-medium">
-                          {employees?.find(emp => emp.id === timesheet.userId)?.name || "Unknown"}
-                        </TableCell>
-                        <TableCell>
-                          {format(new Date(timesheet.weekStart), "MMM d")} - {format(new Date(timesheet.weekEnd), "MMM d, yyyy")}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge className="bg-green-100 text-green-800">Approved</Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+            <TabsContent value="approved">
+              <TimesheetsTable 
+                timesheets={timesheets} 
+                status="approved" 
+                onApprove={handleApprove}
+                onReject={handleReject}
+              />
+            </TabsContent>
+            
+            <TabsContent value="rejected">
+              <TimesheetsTable 
+                timesheets={timesheets} 
+                status="rejected" 
+                onApprove={handleApprove}
+                onReject={handleReject}
+              />
+            </TabsContent>
+            
+            <TabsContent value="draft">
+              <TimesheetsTable 
+                timesheets={timesheets} 
+                status="draft" 
+                onApprove={handleApprove}
+                onReject={handleReject}
+              />
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

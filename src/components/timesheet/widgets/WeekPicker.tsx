@@ -3,11 +3,7 @@
 import { format, addWeeks, startOfWeek, endOfWeek } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "~/components/ui/button";
-
-interface WeekPickerProps {
-  value: Date;
-  onChange: (date: Date) => void;
-}
+import { type WeekPickerProps } from "../utils/types";
 
 export function WeekPicker({ value, onChange }: WeekPickerProps) {
   const weekStart = startOfWeek(value, { weekStartsOn: 1 });

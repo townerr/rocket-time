@@ -4,7 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "~/trpc/react";
-import Navbar from "~/components/navbar";
+import { Navbar } from "~/components/Navbar";
 import { auth } from "~/server/auth";
 
 export const metadata: Metadata = {
@@ -23,7 +23,9 @@ export default async function RootLayout({
       <body>
         <TRPCReactProvider>
           <Navbar session={session} />
-          <main>{children}</main>
+          <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            {children}
+          </main>
         </TRPCReactProvider>
       </body>
     </html>

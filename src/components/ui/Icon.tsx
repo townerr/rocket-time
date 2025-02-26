@@ -1,6 +1,6 @@
 import React from 'react'
 
-const RocketIcon = () => {
+export const RocketIcon = () => {
     return (
         <svg
             className="h-6 w-6 text-white hover:animate-spin transition-colors duration-300"
@@ -22,7 +22,7 @@ const RocketIcon = () => {
     )
 }
 
-const RocketHomeIcon = () => {
+export const RocketHomeIcon = () => {
     return (
         <svg
             className="h-48 w-48 text-white"
@@ -42,6 +42,4 @@ const RocketHomeIcon = () => {
             <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
         </svg>
     )
-}
-
-export { RocketIcon, RocketHomeIcon }
+} 

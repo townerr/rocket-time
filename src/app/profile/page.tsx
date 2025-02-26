@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -10,10 +10,95 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { useToast } from "~/hooks/use-toast";
 import { Skeleton } from "~/components/ui/skeleton";
 
+// Types
+interface ProfileFormData {
+  firstname: string;
+  lastname: string;
+  name: string;
+  email: string;
+}
+
+interface ProfileData {
+  name: string | null;
+  email: string | null;
+  firstname: string | null;
+  lastname: string | null;
+  // Add other fields as needed
+}
+
+// Component for loading skeleton
+function ProfileSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center space-x-4">
+        <Skeleton className="h-12 w-12 rounded-full" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-40" />
+          <Skeleton className="h-3 w-28" />
+        </div>
+      </div>
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <Skeleton className="h-10 w-28" />
+    </div>
+  );
+}
+
+// Component for avatar section
+function ProfileAvatar({ name, email }: { name: string; email: string }) {
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
+  return (
+    <div className="flex items-center space-x-4 mb-6">
+      <Avatar className="h-12 w-12">
+        <AvatarImage src="" alt={name} />
+        <AvatarFallback>{initials}</AvatarFallback>
+      </Avatar>
+      <div>
+        <div className="font-medium text-lg">{name}</div>
+        <div className="text-sm text-muted-foreground">{email}</div>
+      </div>
+    </div>
+  );
+}
+
+// Component for form field
+function FormField({ 
+  id, 
+  label, 
+  value, 
+  onChange 
+}: { 
+  id: string; 
+  label: string; 
+  value: string; 
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; 
+}) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>{label}</Label>
+      <Input
+        id={id}
+        name={id}
+        value={value}
+        onChange={onChange}
+      />
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   const { toast } = useToast();
   const { data: profile, isLoading } = api.profile.getProfile.useQuery();
-  const { mutate: updateProfile } = api.profile.updateProfile.useMutation({
+  const updateProfileMutation = api.profile.updateProfile.useMutation({
     onSuccess: () => {
       toast({
         title: "Profile updated",
@@ -29,7 +114,7 @@ export default function ProfilePage() {
     },
   });
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProfileFormData>({
     firstname: "",
     lastname: "",
     name: "",
@@ -37,150 +122,98 @@ export default function ProfilePage() {
   });
 
   // Update form data when profile is loaded
-  useState(() => {
+  useEffect(() => {
     if (profile) {
       setFormData({
-        firstname: profile.firstname ?? "",
-        lastname: profile.lastname ?? "",
-        name: profile.name ?? "",
-        email: profile.email ?? "",
+        firstname: profile.firstname || "",
+        lastname: profile.lastname || "",
+        name: profile.name || "",
+        email: profile.email || "",
       });
     }
-  });
+  }, [profile]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfile(formData);
+    updateProfileMutation.mutate(formData);
   };
 
-  if (isLoading) {
-    return <ProfileSkeleton />;
-  }
+  // Helper function to ensure we always have strings for the avatar
+  const getDisplayName = (profile: ProfileData | undefined): string => {
+    return profile?.name || "User";
+  };
+
+  const getEmail = (profile: ProfileData | undefined): string => {
+    return profile?.email || "No email";
+  };
 
   return (
-    <div className="container mx-auto py-8">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Profile</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-8 items-center mb-8">
-            <Avatar className="w-32 h-32">
-              <AvatarImage src={profile?.image ?? ""} alt="Profile" />
-              <AvatarFallback>
-                {profile?.firstname?.[0]}
-                {profile?.lastname?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold mb-2">
-                {profile?.firstname} {profile?.lastname}
-              </h2>
-              <p className="text-gray-500 mb-1">{profile?.email}</p>
-              <p className="text-gray-500">
-                {profile?.isManager ? "Manager" : "Employee"}
-              </p>
-            </div>
-          </div>
+    <Card className="max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>Profile Settings</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <ProfileSkeleton />
+        ) : (
+          <form onSubmit={handleSubmit}>
+            {profile && (
+              <ProfileAvatar 
+                name={getDisplayName(profile)} 
+                email={getEmail(profile)} 
+              />
+            )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstname">First Name</Label>
-                <Input
+            <div className="grid gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
                   id="firstname"
+                  label="First Name"
                   value={formData.firstname}
-                  onChange={(e) =>
-                    setFormData({ ...formData, firstname: e.target.value })
-                  }
-                  disabled={!profile?.isManager}
+                  onChange={handleChange}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastname">Last Name</Label>
-                <Input
+                <FormField
                   id="lastname"
+                  label="Last Name"
                   value={formData.lastname}
-                  onChange={(e) =>
-                    setFormData({ ...formData, lastname: e.target.value })
-                  }
-                  disabled={!profile?.isManager}
+                  onChange={handleChange}
                 />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
+              <FormField
+                id="name"
+                label="Display Name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                disabled={!profile?.isManager}
+                onChange={handleChange}
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
+              <FormField
                 id="email"
-                type="email"
+                label="Email"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                disabled={!profile?.isManager}
+                onChange={handleChange}
               />
-            </div>
 
-            {!profile?.isManager && profile?.managerInfo && (
-              <div className="space-y-2">
-                <Label>Manager</Label>
-                <p className="text-gray-600">
-                  {profile.managerInfo.firstname} {profile.managerInfo.lastname}
-                </p>
+              <div className="flex justify-end">
+                <Button 
+                  type="submit" 
+                  disabled={updateProfileMutation.isLoading}
+                >
+                  {updateProfileMutation.isLoading ? "Saving..." : "Save Changes"}
+                </Button>
               </div>
-            )}
-
-            {profile?.isManager && (
-              <Button type="submit" className="w-full">
-                Save Changes
-              </Button>
-            )}
+            </div>
           </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function ProfileSkeleton() {
-  return (
-    <div className="container mx-auto py-8">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Profile</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-8 items-center mb-8">
-            <Skeleton className="w-32 h-32 rounded-full" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-4 w-24" />
-            </div>
-          </div>
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Skeleton className="h-10" />
-              <Skeleton className="h-10" />
-            </div>
-            <Skeleton className="h-10" />
-            <Skeleton className="h-10" />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

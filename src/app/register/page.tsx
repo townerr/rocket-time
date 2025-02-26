@@ -1,22 +1,74 @@
 "use client";
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+
+// Types
+interface RegisterFormData {
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+// Form field component
+interface FormFieldProps {
+  id: string;
+  label: string;
+  type: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+}
+
+const FormField = ({ id, label, type, value, onChange, required = true }: FormFieldProps) => (
+  <div className="space-y-2">
+    <Label htmlFor={id}>{label}</Label>
+    <Input
+      id={id}
+      name={id}
+      type={type}
+      value={value}
+      onChange={onChange}
+      required={required}
+    />
+  </div>
+);
+
+// Error alert component
+const ErrorAlert = ({ message }: { message: string }) => (
+  <Alert variant="destructive" className="mb-4">
+    <AlertCircle className="h-4 w-4" />
+    <AlertDescription>{message}</AlertDescription>
+  </Alert>
+);
 
 export default function RegisterPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterFormData>({
     firstname: '',
     lastname: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,112 +101,84 @@ export default function RegisterPage() {
 
       router.push('/api/auth/signin');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <Card className="w-[400px]">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
           <CardDescription>
-            Enter your information to create an account
+            Enter your information to create your account
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
+          {error && <ErrorAlert message={error} />}
+          
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex gap-4">
-              <div className="space-y-2 flex-1">
-                <Label htmlFor="firstname">First Name</Label>
-                <Input
-                  id="firstname"
-                  name="firstname"
-                  placeholder="John"
-                  value={formData.firstname}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2 flex-1">
-                <Label htmlFor="lastname">Last Name</Label>
-                <Input
-                  id="lastname"
-                  name="lastname"
-                  placeholder="Doe"
-                  value={formData.lastname}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="john@example.com"
-                value={formData.email}
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                id="firstname"
+                label="First Name"
+                type="text"
+                value={formData.firstname}
                 onChange={handleChange}
-                required
+              />
+              
+              <FormField
+                id="lastname"
+                label="Last Name"
+                type="text"
+                value={formData.lastname}
+                onChange={handleChange}
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                minLength={6}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                minLength={6}
-              />
-            </div>
-
+            
+            <FormField
+              id="email"
+              label="Email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            
+            <FormField
+              id="password"
+              label="Password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            
+            <FormField
+              id="confirmPassword"
+              label="Confirm Password"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+            />
+            
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Create account"}
+              {isLoading ? "Creating account..." : "Register"}
             </Button>
           </form>
-          <p className="mt-4 text-sm text-center text-muted-foreground">
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{" "}
-            <Button
-              variant="link"
-              className="p-0"
+            <Button 
+              variant="link" 
+              className="p-0 h-auto font-semibold" 
               onClick={() => router.push('/api/auth/signin')}
             >
               Sign in
             </Button>
           </p>
-        </CardContent>
+        </CardFooter>
       </Card>
     </div>
   );

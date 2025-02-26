@@ -14,15 +14,7 @@ import { Badge } from "~/components/ui/badge";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Separator } from "~/components/ui/separator";
 import type { Timesheet, Entry, WorkType } from "@prisma/client";
-
-interface TimesheetHistoryProps {
-  timesheets: (Timesheet & {
-    entries: (Entry & {
-      type: WorkType;
-    })[];
-  })[];
-  isLoading: boolean;
-}
+import { type TimesheetHistoryProps } from "./utils/types";
 
 export function TimesheetHistory({ timesheets, isLoading }: TimesheetHistoryProps) {
   if (isLoading) {
@@ -131,7 +123,7 @@ function TimesheetCard({ timesheet }: {
                       className="flex items-center justify-between rounded-lg p-3"
                       style={{
                         backgroundColor: `${entry.type.color}15`,
-                        border: `1px solid ${entry.type.borderColor}40`,
+                        border: `1px solid ${entry.type.color}40`,
                       }}
                     >
                       <div className="flex items-center gap-3">
@@ -160,7 +152,7 @@ function TimesheetCard({ timesheet }: {
           
           <div className="flex justify-between items-center pt-2">
             <span className="text-sm text-muted-foreground">
-              Submitted {timesheet.status ? format(new Date(timesheet.updatedAt), "MMM d, yyyy") : "Not yet"}
+              Submitted {timesheet.status === "pending" ? format(new Date(timesheet.updatedAt), "MMM d, yyyy") : "Not yet"}
             </span>
             <div className="text-right text-sm">
               <span className="font-medium">Total Hours:</span> {totalHours}

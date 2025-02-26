@@ -37,7 +37,7 @@ export function TimesheetTable({
           return (
             <div
               key={date.toISOString()}
-              className="border rounded-lg overflow-hidden bg-white dark:bg-gray-900 shadow-sm"
+              className="border rounded-lg overflow-hidden bg-white dark:bg-gray-900 shadow-sm flex flex-col min-h-[300px] h-full"
             >
               <div className="text-center py-2 bg-gray-50 dark:bg-gray-800 border-b">
                 <div className="font-medium">{format(date, "EEEE")}</div>
@@ -46,7 +46,7 @@ export function TimesheetTable({
                 </div>
               </div>
 
-              <div className="p-3 space-y-3">
+              <div className="p-3 space-y-3 flex-grow overflow-y-auto min-h-[150px] flex flex-col">
                 {dayEntries.length > 0 ? (
                   dayEntries.map((entry) => (
                     <DayEntry
@@ -58,7 +58,7 @@ export function TimesheetTable({
                     />
                   ))
                 ) : (
-                  <div className="text-center py-6 text-sm text-muted-foreground">
+                  <div className="text-center py-6 text-sm text-muted-foreground flex-grow flex items-center justify-center">
                     No entries
                   </div>
                 )}
@@ -72,7 +72,7 @@ export function TimesheetTable({
                 />
               </div>
 
-              <div className="flex justify-between items-center p-3 border-t bg-gray-50 dark:bg-gray-800">
+              <div className="flex justify-between items-center p-3 border-t bg-gray-50 dark:bg-gray-800 mt-auto">
                 <span className="text-sm text-muted-foreground">Total</span>
                 <div className="flex items-center font-medium">
                   <Clock className="h-3.5 w-3.5 mr-1 text-muted-foreground" />

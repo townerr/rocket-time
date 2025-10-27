@@ -49,7 +49,11 @@ export const managerRouter = createTRPCRouter({
           userId: input.userId,
         },
         include: {
-          entries: true,
+          entries: {
+            include: {
+              type: true,
+            },
+          },
         },
         orderBy: {
           weekStart: "desc",
@@ -200,9 +204,9 @@ export const managerRouter = createTRPCRouter({
 
       // Initialize with 0 hours for all users
       allUsers.forEach((user) => {
-        if (user && user.id) {
+        if (user?.id) {
           userHoursMap.set(user.id, {
-            name: user.name || "Unknown",
+            name: user.name ?? "Unknown",
             hours: 0,
           });
         }
@@ -217,7 +221,7 @@ export const managerRouter = createTRPCRouter({
         const userId = timesheet.userId;
 
         if (userHoursMap.has(userId)) {
-          const userData = userHoursMap.get(userId);
+          const userData = userHoursMap.get(userId) as { name: string; hours: number };
           userData.hours += totalHours;
           userHoursMap.set(userId, userData);
         }
@@ -226,13 +230,13 @@ export const managerRouter = createTRPCRouter({
       // Convert to array and sort by hours (descending)
       const result = Array.from(userHoursMap.values())
         // Removed the filter to see ALL users, even with 0 hours
-        .sort((a, b) => b.hours - a.hours);
+        .sort((a: { hours: number }, b: { hours: number }) => b.hours - a.hours);
 
       console.log(
         `Returning data for ${result.length} users with hours:`,
         result,
       );
-      return result;
+      return result as { name: string; hours: number }[];
     }),
 
   // Get project distribution within date range
@@ -313,7 +317,7 @@ export const managerRouter = createTRPCRouter({
       // Add up hours from timesheet entries
       timesheets.forEach((timesheet) => {
         timesheet.entries.forEach((entry) => {
-          const projectCode = entry.projectCode || "Unassigned";
+          const projectCode = entry.projectCode ?? "Unassigned";
 
           if (projectMap.has(projectCode)) {
             projectMap.set(
@@ -328,7 +332,7 @@ export const managerRouter = createTRPCRouter({
 
       // Convert to array format for charts
       const result = Array.from(projectMap.entries())
-        .map(([name, value]) => ({ name, value }))
+        .map(([name, value]: [string, number]) => ({ name, value }))
         // Removed filter to see all projects
         .sort((a, b) => b.value - a.value);
 
@@ -543,7 +547,7 @@ export const managerRouter = createTRPCRouter({
 
   // WorkType Management
   getAllWorkTypes: protectedProcedure.query(async ({ ctx }) => {
-    if (!ctx.session.user.isManager) {
+    if (!(ctx.session.user.isManager ?? false)) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: "Only managers can view work types",
@@ -562,7 +566,7 @@ export const managerRouter = createTRPCRouter({
   getWorkTypeById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      if (!ctx.session.user.isManager) {
+      if (!(ctx.session.user.isManager ?? false)) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Only managers can view work types",

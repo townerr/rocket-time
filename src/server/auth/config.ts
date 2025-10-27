@@ -1,6 +1,7 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
+import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import { db } from "~/server/db";
@@ -26,9 +27,6 @@ declare module "next-auth" {
  *
  * @see https://next-auth.js.org/configuration/options
  */
-
-//TODO: add github and google provider
-//TODO: add first name and last name to credentials provider
 export const authConfig = {
 	providers: [
 		/*CredentialsProvider({
@@ -54,7 +52,12 @@ export const authConfig = {
 				}
 			},
 		}),*/
-		DiscordProvider,
+		GithubProvider({
+			allowDangerousEmailAccountLinking: true,
+		}),
+		DiscordProvider({
+			allowDangerousEmailAccountLinking: true,
+		}),
 	],
 	adapter: PrismaAdapter(db),
 	callbacks: {

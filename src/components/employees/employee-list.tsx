@@ -21,7 +21,11 @@ interface EmployeeListProps {
   onSearchChange: (value: string) => void;
 }
 
-export function EmployeeList({ employees, searchQuery, onSearchChange }: EmployeeListProps) {
+export function EmployeeList({
+  employees,
+  searchQuery,
+  onSearchChange,
+}: EmployeeListProps) {
   // Add state for employees to handle updates
   const [employeeList, setEmployeeList] = useState<User[]>(employees);
   const utils = api.useContext();
@@ -36,15 +40,16 @@ export function EmployeeList({ employees, searchQuery, onSearchChange }: Employe
     setEmployeeList(employees);
   }, [employees]);
 
-  const filteredEmployees = employeeList?.filter(employee => 
-    employee.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    employee.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredEmployees = employeeList?.filter(
+    (employee) =>
+      employee.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      employee.email?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
     <>
       <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-500" />
         <Input
           placeholder="Search employees..."
           className="pl-10"
@@ -66,8 +71,8 @@ export function EmployeeList({ employees, searchQuery, onSearchChange }: Employe
           </TableHeader>
           <TableBody>
             {filteredEmployees?.map((employee) => (
-              <EmployeeRow 
-                key={employee.id} 
+              <EmployeeRow
+                key={employee.id}
                 employee={employee}
                 onStatusChange={handleStatusChange}
               />
@@ -77,4 +82,4 @@ export function EmployeeList({ employees, searchQuery, onSearchChange }: Employe
       </div>
     </>
   );
-} 
+}

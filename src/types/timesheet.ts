@@ -12,4 +12,4 @@ export interface Timesheet {
   weekEnd: Date;
   status: string | null;
   entries: TimesheetEntry[];
-} 
+}

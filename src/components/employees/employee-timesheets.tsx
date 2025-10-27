@@ -6,12 +6,10 @@ interface EmployeeTimesheetsProps {
 }
 
 export function EmployeeTimesheets({ userId }: EmployeeTimesheetsProps) {
-  const { data: timesheets, isLoading } = api.manager.getEmployeeTimesheets.useQuery({ userId });
-  
+  const { data: timesheets, isLoading } =
+    api.manager.getEmployeeTimesheets.useQuery({ userId });
+
   return (
-    <TimesheetHistory 
-      timesheets={timesheets ?? []} 
-      isLoading={isLoading} 
-    />
+    <TimesheetHistory timesheets={timesheets ?? []} isLoading={isLoading} />
   );
-} 
+}

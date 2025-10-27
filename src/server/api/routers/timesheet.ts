@@ -21,7 +21,7 @@ export const timesheetRouter = createTRPCRouter({
               type: true,
             },
             orderBy: {
-              date: 'asc',
+              date: "asc",
             },
           },
         },
@@ -48,24 +48,25 @@ export const timesheetRouter = createTRPCRouter({
       return timesheet;
     }),
 
-  getWorkTypes: protectedProcedure
-    .query(async ({ ctx }) => {
-      return ctx.db.workType.findMany({
-        orderBy: {
-          name: 'asc',
-        },
-      });
-    }),
+  getWorkTypes: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.workType.findMany({
+      orderBy: {
+        name: "asc",
+      },
+    });
+  }),
 
   saveEntry: protectedProcedure
-    .input(z.object({
-      id: z.string().optional(),
-      timesheetId: z.string(),
-      date: z.date(),
-      workTypeId: z.string(),
-      hours: z.number(),
-      projectCode: z.string().optional().nullable(),
-    }))
+    .input(
+      z.object({
+        id: z.string().optional(),
+        timesheetId: z.string(),
+        date: z.date(),
+        workTypeId: z.string(),
+        hours: z.number(),
+        projectCode: z.string().optional().nullable(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       if (input.id) {
         return ctx.db.entry.update({
@@ -97,9 +98,11 @@ export const timesheetRouter = createTRPCRouter({
     }),
 
   deleteEntry: protectedProcedure
-    .input(z.object({
-      id: z.string(),
-    }))
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.entry.delete({
         where: { id: input.id },
@@ -107,15 +110,17 @@ export const timesheetRouter = createTRPCRouter({
     }),
 
   submitTimesheet: protectedProcedure
-    .input(z.object({
-      id: z.string(),
-    }))
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.timesheet.update({
         where: { id: input.id },
         data: {
-          status: 'pending',
+          status: "pending",
         },
       });
     }),
-}); 
+});

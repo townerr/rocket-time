@@ -57,50 +57,51 @@ export const profileRouter = createTRPCRouter({
       });
     }),
 
-  getBalances: protectedProcedure
-    .query(async ({ ctx }) => {
-      // Get balances
-      const balances = await ctx.db.balance.findUnique({
-        where: {
+  getBalances: protectedProcedure.query(async ({ ctx }) => {
+    // Get balances
+    const balances = await ctx.db.balance.findUnique({
+      where: {
+        userId: ctx.session.user.id,
+      },
+    });
+
+    // Get leave history from timesheet entries
+    const history = await ctx.db.entry.findMany({
+      where: {
+        timesheet: {
           userId: ctx.session.user.id,
         },
-      });
-
-      // Get leave history from timesheet entries
-      const history = await ctx.db.entry.findMany({
-        where: {
-          timesheet: {
-            userId: ctx.session.user.id,
-          },
-          type: {
-            name: {
-              in: ['Vacation', 'Sick'],
-            },
+        type: {
+          name: {
+            in: ["Vacation", "Sick"],
           },
         },
-        include: {
-          timesheet: true,
-          type: true,
-        },
-        orderBy: {
-          date: 'desc',
-        },
-      });
+      },
+      include: {
+        timesheet: true,
+        type: true,
+      },
+      orderBy: {
+        date: "desc",
+      },
+    });
 
-      // Create default balances if none exist
-      const finalBalances = balances ?? await ctx.db.balance.create({
+    // Create default balances if none exist
+    const finalBalances =
+      balances ??
+      (await ctx.db.balance.create({
         data: {
           userId: ctx.session.user.id,
           vacation: 120,
           sick: 40,
         },
-      });
+      }));
 
-      return {
-        balances: finalBalances,
-        history,
-      };
-    }),
+    return {
+      balances: finalBalances,
+      history,
+    };
+  }),
 
   getTimesheetHistory: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.timesheet.findMany({
@@ -113,51 +114,50 @@ export const profileRouter = createTRPCRouter({
             type: true,
           },
           orderBy: {
-            date: 'asc',
+            date: "asc",
           },
         },
       },
       orderBy: {
-        weekStart: 'desc',
+        weekStart: "desc",
       },
     });
   }),
 
-  getLeaveHistory: protectedProcedure
-    .query(async ({ ctx }) => {
-      const leaveEntries = await ctx.db.entry.findMany({
-        where: {
-          timesheet: {
-            userId: ctx.session.user.id,
-          },
-          type: {
-            name: {
-              in: ['Vacation', 'Sick']
-            }
-          }
+  getLeaveHistory: protectedProcedure.query(async ({ ctx }) => {
+    const leaveEntries = await ctx.db.entry.findMany({
+      where: {
+        timesheet: {
+          userId: ctx.session.user.id,
         },
-        include: {
-          timesheet: {
-            select: {
-              weekStart: true,
-              weekEnd: true,
-              status: true,
-            }
+        type: {
+          name: {
+            in: ["Vacation", "Sick"],
           },
-          type: {
-            select: {
-              name: true,
-              color: true,
-            }
-          }
         },
-        orderBy: [
-          {
-            date: 'desc',
-          }
-        ],
-      });
+      },
+      include: {
+        timesheet: {
+          select: {
+            weekStart: true,
+            weekEnd: true,
+            status: true,
+          },
+        },
+        type: {
+          select: {
+            name: true,
+            color: true,
+          },
+        },
+      },
+      orderBy: [
+        {
+          date: "desc",
+        },
+      ],
+    });
 
-      return leaveEntries;
-    }),
-}); 
+    return leaveEntries;
+  }),
+});

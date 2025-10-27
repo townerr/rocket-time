@@ -6,18 +6,23 @@ interface EmployeeBalancesProps {
 }
 
 export function EmployeeBalances({ userId }: EmployeeBalancesProps) {
-  const { data: balances, isLoading } = api.manager.getEmployeeBalances.useQuery({ userId });
-  
+  const { data: balances, isLoading } =
+    api.manager.getEmployeeBalances.useQuery({ userId });
+
   if (isLoading) return <div>Loading...</div>;
-  
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Vacation Balance</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            Vacation Balance
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{balances?.vacation || 0} days</div>
+          <div className="text-2xl font-bold">
+            {balances?.vacation || 0} days
+          </div>
         </CardContent>
       </Card>
       <Card>
@@ -30,4 +35,4 @@ export function EmployeeBalances({ userId }: EmployeeBalancesProps) {
       </Card>
     </div>
   );
-} 
+}

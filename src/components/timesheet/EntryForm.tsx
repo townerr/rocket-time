@@ -73,7 +73,9 @@ export function EntryForm({ entry, date, workTypes, onSave }: EntryFormProps) {
         onChange={(e) => setHours(e.target.value)}
       />
 
-      <Button onClick={handleSave} className="w-full">Save Entry</Button>
+      <Button onClick={handleSave} className="w-full">
+        Save Entry
+      </Button>
     </div>
   );
-} 
+}

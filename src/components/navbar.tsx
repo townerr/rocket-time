@@ -11,10 +11,15 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Button } from "~/components/ui/button";
 import { Avatar, AvatarImage } from "~/components/ui/avatar";
-import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "~/components/ui/navigation-menu";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "~/components/ui/navigation-menu";
 import { RocketIcon } from "~/components/ui/Icon";
 import { cn } from "~/lib/utils";
-import { 
+import {
   ChevronDown,
   ClipboardCheck,
   Users2,
@@ -23,7 +28,7 @@ import {
   Clock,
   History,
   LogOut,
-  CogIcon
+  CogIcon,
 } from "lucide-react";
 
 interface NavbarProps {
@@ -37,11 +42,11 @@ interface NavbarProps {
 export function Navbar({ session }: NavbarProps) {
   return (
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 to-blue-500 shadow-lg">
-      <div className="container flex h-16 items-center justify-between px-4 mx-auto">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Left side - Logo */}
         <Link href="/" className="flex items-center gap-2">
           <RocketIcon />
-          <span className="font-bold text-lg text-white hover:text-indigo-100 transition-colors duration-300">
+          <span className="text-lg font-bold text-white transition-colors duration-300 hover:text-indigo-100">
             RocketTime
           </span>
         </Link>
@@ -54,11 +59,13 @@ export function Navbar({ session }: NavbarProps) {
                 <NavigationMenuList className="gap-4">
                   <NavigationMenuItem>
                     <Link href="/timesheet" legacyBehavior passHref>
-                      <NavigationMenuLink className={cn(
-                        "text-sm text-white font-medium transition-colors",
-                        "hover:bg-white/10",
-                        "rounded-md px-3.5 py-2.5"
-                      )}>
+                      <NavigationMenuLink
+                        className={cn(
+                          "text-sm font-medium text-white transition-colors",
+                          "hover:bg-white/10",
+                          "rounded-md px-3.5 py-2.5",
+                        )}
+                      >
                         Timesheet
                       </NavigationMenuLink>
                     </Link>
@@ -67,35 +74,47 @@ export function Navbar({ session }: NavbarProps) {
                   {session.user.isManager && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           className="text-white hover:bg-white/10 hover:text-white"
                         >
-                          Manager <ChevronDown className="w-4 h-4" />
+                          Manager <ChevronDown className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-white/95 backdrop-blur-sm">
                         <DropdownMenuItem asChild>
-                          <Link href="/manager/approvals" className="flex items-center gap-2">
-                            <ClipboardCheck className="w-4 h-4" />
+                          <Link
+                            href="/manager/approvals"
+                            className="flex items-center gap-2"
+                          >
+                            <ClipboardCheck className="h-4 w-4" />
                             Approvals
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/manager/employees" className="flex items-center gap-2">
-                            <Users2 className="w-4 h-4" />
+                          <Link
+                            href="/manager/employees"
+                            className="flex items-center gap-2"
+                          >
+                            <Users2 className="h-4 w-4" />
                             Employee Management
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/manager/settings" className="flex items-center gap-2">
-                            <CogIcon className="w-4 h-4" />
+                          <Link
+                            href="/manager/settings"
+                            className="flex items-center gap-2"
+                          >
+                            <CogIcon className="h-4 w-4" />
                             Timesheet Settings
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/manager/analytics" className="flex items-center gap-2">
-                            <BarChart2 className="w-4 h-4" />
+                          <Link
+                            href="/manager/analytics"
+                            className="flex items-center gap-2"
+                          >
+                            <BarChart2 className="h-4 w-4" />
                             Analytics
                           </Link>
                         </DropdownMenuItem>
@@ -107,45 +126,51 @@ export function Navbar({ session }: NavbarProps) {
 
               {/* User dropdown */}
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1 hover:opacity-80 transition-opacity">
+                <DropdownMenuTrigger className="flex items-center gap-1 transition-opacity hover:opacity-80">
                   <Avatar className="h-8 w-8 ring-2 ring-white/20">
                     <AvatarImage src={session.user.image ?? undefined} />
                   </Avatar>
-                  <ChevronDown className="text-white w-4 h-4" />
+                  <ChevronDown className="h-4 w-4 text-white" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white/95 backdrop-blur-sm">
                   <DropdownMenuItem asChild>
                     <Link href="/profile" className="flex items-center gap-2">
-                      <UserCircle className="w-4 h-4" />
+                      <UserCircle className="h-4 w-4" />
                       Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile/balances" className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
+                    <Link
+                      href="/profile/balances"
+                      className="flex items-center gap-2"
+                    >
+                      <Clock className="h-4 w-4" />
                       Balances
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile/history" className="flex items-center gap-2">
-                      <History className="w-4 h-4" />
+                    <Link
+                      href="/profile/history"
+                      className="flex items-center gap-2"
+                    >
+                      <History className="h-4 w-4" />
                       History
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => signOut({ callbackUrl: "/" })}
-                    className="text-red-600 focus:text-red-600 focus:bg-red-50 flex items-center gap-2"
+                    className="flex items-center gap-2 text-red-600 focus:bg-red-50 focus:text-red-600"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="h-4 w-4" />
                     Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
           ) : (
-            <Button 
-              asChild 
-              variant="outline" 
+            <Button
+              asChild
+              variant="outline"
               className="border-white text-blue-600 hover:text-blue-800"
             >
               <Link href="/api/auth/signin">Sign In</Link>
@@ -155,4 +180,4 @@ export function Navbar({ session }: NavbarProps) {
       </div>
     </nav>
   );
-} 
+}

@@ -15,17 +15,17 @@ import {
 import { Badge } from "~/components/ui/badge";
 
 const ENTRY_TYPE_COLORS = {
-  Project: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
-  Vacation: 'bg-green-100 text-green-800 hover:bg-green-100',
-  Sick: 'bg-orange-100 text-orange-800 hover:bg-orange-100',
-  Holiday: 'bg-purple-100 text-purple-800 hover:bg-purple-100',
+  Project: "bg-blue-100 text-blue-800 hover:bg-blue-100",
+  Vacation: "bg-green-100 text-green-800 hover:bg-green-100",
+  Sick: "bg-orange-100 text-orange-800 hover:bg-orange-100",
+  Holiday: "bg-purple-100 text-purple-800 hover:bg-purple-100",
 } as const;
 
 const STATUS_COLORS = {
-  pending: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100',
-  approved: 'bg-green-100 text-green-800 hover:bg-green-100',
-  rejected: 'bg-red-100 text-red-800 hover:bg-red-100',
-  draft: 'bg-gray-100 text-gray-800 hover:bg-gray-100',
+  pending: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
+  approved: "bg-green-100 text-green-800 hover:bg-green-100",
+  rejected: "bg-red-100 text-red-800 hover:bg-red-100",
+  draft: "bg-gray-100 text-gray-800 hover:bg-gray-100",
 } as const;
 
 interface TimesheetEntry {
@@ -51,16 +51,13 @@ interface TimesheetHistoryItemProps {
 export function TimesheetHistoryItem({ timesheet }: TimesheetHistoryItemProps) {
   const totalHours = timesheet.entries.reduce(
     (sum, entry) => sum + entry.hours,
-    0
+    0,
   );
 
   return (
-    <AccordionItem
-      value={timesheet.id}
-      className="border rounded-lg px-4"
-    >
+    <AccordionItem value={timesheet.id} className="rounded-lg border px-4">
       <AccordionTrigger className="py-4 hover:no-underline">
-        <div className="flex flex-col md:flex-row w-full items-start md:items-center gap-4 text-left">
+        <div className="flex w-full flex-col items-start gap-4 text-left md:flex-row md:items-center">
           <div className="flex-1">
             <div className="font-semibold">
               {format(timesheet.weekStart, "MMM d")} -{" "}
@@ -74,7 +71,8 @@ export function TimesheetHistoryItem({ timesheet }: TimesheetHistoryItemProps) {
             variant="secondary"
             className={`${
               STATUS_COLORS[
-                (timesheet.status?.toLowerCase() ?? "draft") as keyof typeof STATUS_COLORS
+                (timesheet.status?.toLowerCase() ??
+                  "draft") as keyof typeof STATUS_COLORS
               ]
             }`}
           >
@@ -96,9 +94,7 @@ export function TimesheetHistoryItem({ timesheet }: TimesheetHistoryItemProps) {
             <TableBody>
               {timesheet.entries.map((entry) => (
                 <TableRow key={entry.id}>
-                  <TableCell>
-                    {format(entry.date, "MMM d, yyyy")}
-                  </TableCell>
+                  <TableCell>{format(entry.date, "MMM d, yyyy")}</TableCell>
                   <TableCell>
                     <Badge
                       variant="secondary"
@@ -127,4 +123,4 @@ export function TimesheetHistoryItem({ timesheet }: TimesheetHistoryItemProps) {
       </AccordionContent>
     </AccordionItem>
   );
-} 
+}

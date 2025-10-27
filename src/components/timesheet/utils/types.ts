@@ -1,12 +1,12 @@
 import type { Timesheet, Entry, WorkType } from "@prisma/client";
 
 export interface TimesheetEntryData {
-  id?: string
-  timesheetId?: string
-  date: Date
-  workTypeId: string
-  hours: number
-  projectCode?: string | null
+  id?: string;
+  timesheetId?: string;
+  date: Date;
+  workTypeId: string;
+  hours: number;
+  projectCode?: string | null;
 }
 
 export type EnhancedEntry = Entry & {
@@ -27,11 +27,14 @@ export interface TimesheetHistoryProps {
 }
 
 export interface TimesheetTableProps {
-  timesheet: (Timesheet & {
-    entries: (Entry & {
-      type: WorkType;
-    })[];
-  }) | null | undefined;
+  timesheet:
+    | (Timesheet & {
+        entries: (Entry & {
+          type: WorkType;
+        })[];
+      })
+    | null
+    | undefined;
   workTypes: WorkType[];
   isLoading: boolean;
   onSave: (entry: TimesheetEntryData) => void;

@@ -24,20 +24,23 @@ export function EmployeeDetails({ employee }: EmployeeDetailsProps) {
           View and manage employee information
         </DialogDescription>
       </DialogHeader>
-      
+
       <Tabs defaultValue="profile" className="mt-4">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="balances">Balances</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="profile" className="space-y-4">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
               <AvatarImage src={employee.image ?? undefined} />
               <AvatarFallback className="text-lg">
-                {employee.name?.split(" ").map(n => n[0]).join("")}
+                {employee.name
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .join("")}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -45,7 +48,7 @@ export function EmployeeDetails({ employee }: EmployeeDetailsProps) {
               <div className="text-muted-foreground">Engineering</div>
             </div>
           </div>
-          
+
           <div className="grid gap-4 md:grid-cols-2">
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-muted-foreground" />
@@ -61,15 +64,15 @@ export function EmployeeDetails({ employee }: EmployeeDetailsProps) {
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="balances">
           <EmployeeBalances userId={employee.id} />
         </TabsContent>
-        
+
         <TabsContent value="history">
           <EmployeeTimesheets userId={employee.id} />
         </TabsContent>
       </Tabs>
     </DialogContent>
   );
-} 
+}

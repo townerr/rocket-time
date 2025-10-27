@@ -1,8 +1,15 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "~/components/ui/card";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
@@ -28,7 +35,14 @@ interface FormFieldProps {
   required?: boolean;
 }
 
-const FormField = ({ id, label, type, value, onChange, required = true }: FormFieldProps) => (
+const FormField = ({
+  id,
+  label,
+  type,
+  value,
+  onChange,
+  required = true,
+}: FormFieldProps) => (
   <div className="space-y-2">
     <Label htmlFor={id}>{label}</Label>
     <Input
@@ -55,18 +69,18 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<RegisterFormData>({
-    firstname: '',
-    lastname: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -81,44 +95,48 @@ export default function RegisterPage() {
         throw new Error("Passwords do not match");
       }
 
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           firstname: formData.firstname,
           lastname: formData.lastname,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Registration failed');
+        throw new Error(errorData.message || "Registration failed");
       }
 
-      router.push('/api/auth/signin');
+      router.push("/api/auth/signin");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            Create an account
+          </CardTitle>
           <CardDescription>
             Enter your information to create your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           {error && <ErrorAlert message={error} />}
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <FormField
@@ -128,7 +146,7 @@ export default function RegisterPage() {
                 value={formData.firstname}
                 onChange={handleChange}
               />
-              
+
               <FormField
                 id="lastname"
                 label="Last Name"
@@ -137,7 +155,7 @@ export default function RegisterPage() {
                 onChange={handleChange}
               />
             </div>
-            
+
             <FormField
               id="email"
               label="Email"
@@ -145,7 +163,7 @@ export default function RegisterPage() {
               value={formData.email}
               onChange={handleChange}
             />
-            
+
             <FormField
               id="password"
               label="Password"
@@ -153,7 +171,7 @@ export default function RegisterPage() {
               value={formData.password}
               onChange={handleChange}
             />
-            
+
             <FormField
               id="confirmPassword"
               label="Confirm Password"
@@ -161,7 +179,7 @@ export default function RegisterPage() {
               value={formData.confirmPassword}
               onChange={handleChange}
             />
-            
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Register"}
             </Button>
@@ -170,10 +188,10 @@ export default function RegisterPage() {
         <CardFooter className="flex justify-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{" "}
-            <Button 
-              variant="link" 
-              className="p-0 h-auto font-semibold" 
-              onClick={() => router.push('/api/auth/signin')}
+            <Button
+              variant="link"
+              className="h-auto p-0 font-semibold"
+              onClick={() => router.push("/api/auth/signin")}
             >
               Sign in
             </Button>

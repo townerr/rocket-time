@@ -57,13 +57,13 @@ function ProfileAvatar({ name, email }: { name: string; email: string }) {
     .toUpperCase();
 
   return (
-    <div className="flex items-center space-x-4 mb-6">
+    <div className="mb-6 flex items-center space-x-4">
       <Avatar className="h-12 w-12">
         <AvatarImage src="" alt={name} />
         <AvatarFallback>{initials}</AvatarFallback>
       </Avatar>
       <div>
-        <div className="font-medium text-lg">{name}</div>
+        <div className="text-lg font-medium">{name}</div>
         <div className="text-sm text-muted-foreground">{email}</div>
       </div>
     </div>
@@ -71,26 +71,21 @@ function ProfileAvatar({ name, email }: { name: string; email: string }) {
 }
 
 // Component for form field
-function FormField({ 
-  id, 
-  label, 
-  value, 
-  onChange 
-}: { 
-  id: string; 
-  label: string; 
-  value: string; 
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; 
+function FormField({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        name={id}
-        value={value}
-        onChange={onChange}
-      />
+      <Input id={id} name={id} value={value} onChange={onChange} />
     </div>
   );
 }
@@ -125,10 +120,10 @@ export default function ProfilePage() {
   useEffect(() => {
     if (profile) {
       setFormData({
-        firstname: profile.firstname || "",
-        lastname: profile.lastname || "",
-        name: profile.name || "",
-        email: profile.email || "",
+        firstname: profile.firstname ?? "",
+        lastname: profile.lastname ?? "",
+        name: profile.name ?? "",
+        email: profile.email ?? "",
       });
     }
   }, [profile]);
@@ -146,17 +141,8 @@ export default function ProfilePage() {
     updateProfileMutation.mutate(formData);
   };
 
-  // Helper function to ensure we always have strings for the avatar
-  const getDisplayName = (profile: ProfileData | undefined): string => {
-    return profile?.name || "User";
-  };
-
-  const getEmail = (profile: ProfileData | undefined): string => {
-    return profile?.email || "No email";
-  };
-
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card className="mx-auto max-w-2xl">
       <CardHeader>
         <CardTitle>Profile Settings</CardTitle>
       </CardHeader>
@@ -166,14 +152,14 @@ export default function ProfilePage() {
         ) : (
           <form onSubmit={handleSubmit}>
             {profile && (
-              <ProfileAvatar 
-                name={getDisplayName(profile)} 
-                email={getEmail(profile)} 
+              <ProfileAvatar
+                name={profile.name ?? "User"}
+                email={profile.email ?? "No email"}
               />
             )}
 
             <div className="grid gap-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <FormField
                   id="firstname"
                   label="First Name"
@@ -203,11 +189,13 @@ export default function ProfilePage() {
               />
 
               <div className="flex justify-end">
-                <Button 
-                  type="submit" 
-                  disabled={updateProfileMutation.isLoading}
+                <Button
+                  type="submit"
+                  disabled={updateProfileMutation.isPending}
                 >
-                  {updateProfileMutation.isLoading ? "Saving..." : "Save Changes"}
+                  {updateProfileMutation.isPending
+                    ? "Saving..."
+                    : "Save Changes"}
                 </Button>
               </div>
             </div>

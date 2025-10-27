@@ -51,48 +51,66 @@ const formatDateRange = (startDate: Date) => {
 // Component for status badge
 const StatusBadge = ({ status }: { status: TimesheetStatus }) => {
   const statusConfig = {
-    draft: { label: "Draft", className: "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300" },
-    pending: { label: "Pending Approval", className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500" },
-    approved: { label: "Approved", className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-500" },
-    rejected: { label: "Rejected", className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-500" },
+    draft: {
+      label: "Draft",
+      className:
+        "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+    },
+    pending: {
+      label: "Pending Approval",
+      className:
+        "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500",
+    },
+    approved: {
+      label: "Approved",
+      className:
+        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-500",
+    },
+    rejected: {
+      label: "Rejected",
+      className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-500",
+    },
   };
 
   const config = statusConfig[status];
-  return (
-    <Badge className={config.className}>
-      {config.label}
-    </Badge>
-  );
+  return <Badge className={config.className}>{config.label}</Badge>;
 };
 
 // Helper to determine timesheet status
-const getTimesheetStatus = (timesheet: TimesheetWithEntries): TimesheetStatus => {
-  if (timesheet.submitted === false || timesheet.status === "draft" || !timesheet.status) return "draft";
+const getTimesheetStatus = (
+  timesheet: TimesheetWithEntries,
+): TimesheetStatus => {
+  if (
+    timesheet.submitted === false ||
+    timesheet.status === "draft" ||
+    !timesheet.status
+  )
+    return "draft";
   if (timesheet.approved || timesheet.status === "approved") return "approved";
   if (timesheet.rejected || timesheet.status === "rejected") return "rejected";
   return "pending";
 };
 
 // Component for the timesheet table
-const TimesheetsTable = ({ 
-  timesheets, 
+const TimesheetsTable = ({
+  timesheets,
   status,
   onApprove,
-  onReject
-}: { 
-  timesheets: TimesheetWithEntries[]; 
+  onReject,
+}: {
+  timesheets: TimesheetWithEntries[];
   status: TimesheetStatus;
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
 }) => {
-  const filteredTimesheets = timesheets.filter(timesheet => {
+  const filteredTimesheets = timesheets.filter((timesheet) => {
     const timesheetStatus = getTimesheetStatus(timesheet);
     return timesheetStatus === status;
   });
 
   if (filteredTimesheets.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="py-8 text-center text-gray-500">
         No timesheets found with {status} status.
       </div>
     );
@@ -114,7 +132,7 @@ const TimesheetsTable = ({
           // Calculate total hours
           const totalHours = timesheet.entries.reduce(
             (acc, entry) => acc + entry.hours,
-            0
+            0,
           );
 
           // Get timesheet status
@@ -150,7 +168,7 @@ const TimesheetsTable = ({
                       variant="outline"
                       size="sm"
                       onClick={() => onApprove(timesheet.id)}
-                      className="text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700 dark:border-green-900 dark:hover:bg-green-900/20"
+                      className="border-green-200 text-green-600 hover:bg-green-50 hover:text-green-700 dark:border-green-900 dark:hover:bg-green-900/20"
                     >
                       <CheckCircle className="mr-1 h-4 w-4" />
                       Approve
@@ -159,7 +177,7 @@ const TimesheetsTable = ({
                       variant="outline"
                       size="sm"
                       onClick={() => onReject(timesheet.id)}
-                      className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:hover:bg-red-900/20"
+                      className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:hover:bg-red-900/20"
                     >
                       <XCircle className="mr-1 h-4 w-4" />
                       Reject
@@ -178,22 +196,24 @@ const TimesheetsTable = ({
 export default function ApprovalsPage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<TimesheetStatus>("pending");
-  
-  const { data: employees, isLoading: employeesLoading } = api.manager.getEmployees.useQuery();
-  
+
+  const { data: employees, isLoading: employeesLoading } =
+    api.manager.getEmployees.useQuery();
+
   // Fetch all employee timesheets
-  const { 
-    data: timesheets = [], 
-    isLoading: timesheetsLoading, 
-    refetch: refetchTimesheets 
+  const {
+    data: timesheets = [],
+    isLoading: timesheetsLoading,
+    refetch: refetchTimesheets,
   } = api.manager.getAllEmployeeTimesheets.useQuery(undefined, {
     enabled: !!employees,
-    select: (data) => data.map(timesheet => ({
-      ...timesheet,
-      employeeName: timesheet.user?.name || 'Unknown Employee'
-    })) as TimesheetWithEntries[]
+    select: (data) =>
+      data.map((timesheet) => ({
+        ...timesheet,
+        employeeName: timesheet.user?.name || "Unknown Employee",
+      })) as TimesheetWithEntries[],
   });
-  
+
   const approveTimesheet = api.manager.approveTimesheet.useMutation({
     onSuccess: () => {
       toast({
@@ -208,7 +228,7 @@ export default function ApprovalsPage() {
         description: error.message,
         variant: "destructive",
       });
-    }
+    },
   });
 
   const rejectTimesheet = api.manager.rejectTimesheet.useMutation({
@@ -225,7 +245,7 @@ export default function ApprovalsPage() {
         description: error.message,
         variant: "destructive",
       });
-    }
+    },
   });
 
   const handleApprove = (timesheetId: string) => {
@@ -239,7 +259,7 @@ export default function ApprovalsPage() {
   const isLoading = employeesLoading || timesheetsLoading;
 
   return (
-    <Card className="max-w-5xl mx-auto">
+    <Card className="mx-auto max-w-5xl">
       <CardHeader>
         <CardTitle>Timesheet Approvals</CardTitle>
       </CardHeader>
@@ -247,50 +267,54 @@ export default function ApprovalsPage() {
         {isLoading ? (
           <div className="flex justify-center py-8">
             <div className="animate-pulse space-y-4">
-              <div className="h-4 bg-gray-200 rounded w-64 dark:bg-gray-700"></div>
-              <div className="h-40 bg-gray-200 rounded dark:bg-gray-700"></div>
+              <div className="h-4 w-64 rounded bg-gray-200 dark:bg-gray-700"></div>
+              <div className="h-40 rounded bg-gray-200 dark:bg-gray-700"></div>
             </div>
           </div>
         ) : (
-          <Tabs defaultValue="pending" value={activeTab} onValueChange={(value) => setActiveTab(value as TimesheetStatus)}>
+          <Tabs
+            defaultValue="pending"
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value as TimesheetStatus)}
+          >
             <TabsList className="mb-4">
               <TabsTrigger value="pending">Pending Approval</TabsTrigger>
               <TabsTrigger value="approved">Approved</TabsTrigger>
               <TabsTrigger value="rejected">Rejected</TabsTrigger>
               <TabsTrigger value="draft">Drafts</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="pending">
-              <TimesheetsTable 
-                timesheets={timesheets} 
-                status="pending" 
+              <TimesheetsTable
+                timesheets={timesheets}
+                status="pending"
                 onApprove={handleApprove}
                 onReject={handleReject}
               />
             </TabsContent>
-            
+
             <TabsContent value="approved">
-              <TimesheetsTable 
-                timesheets={timesheets} 
-                status="approved" 
+              <TimesheetsTable
+                timesheets={timesheets}
+                status="approved"
                 onApprove={handleApprove}
                 onReject={handleReject}
               />
             </TabsContent>
-            
+
             <TabsContent value="rejected">
-              <TimesheetsTable 
-                timesheets={timesheets} 
-                status="rejected" 
+              <TimesheetsTable
+                timesheets={timesheets}
+                status="rejected"
                 onApprove={handleApprove}
                 onReject={handleReject}
               />
             </TabsContent>
-            
+
             <TabsContent value="draft">
-              <TimesheetsTable 
-                timesheets={timesheets} 
-                status="draft" 
+              <TimesheetsTable
+                timesheets={timesheets}
+                status="draft"
                 onApprove={handleApprove}
                 onReject={handleReject}
               />

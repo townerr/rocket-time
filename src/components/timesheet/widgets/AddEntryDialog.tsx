@@ -44,9 +44,13 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function AddEntryDialog({ date, workTypes, onSave }: AddEntryDialogProps) {
+export function AddEntryDialog({
+  date,
+  workTypes,
+  onSave,
+}: AddEntryDialogProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -71,7 +75,7 @@ export function AddEntryDialog({ date, workTypes, onSave }: AddEntryDialogProps)
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="w-full">
-          <Plus className="h-4 w-4 mr-1" /> Add Entry
+          <Plus className="mr-1 h-4 w-4" /> Add Entry
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -147,4 +151,4 @@ export function AddEntryDialog({ date, workTypes, onSave }: AddEntryDialogProps)
       </DialogContent>
     </Dialog>
   );
-} 
+}

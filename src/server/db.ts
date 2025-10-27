@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaNeon } from '@prisma/adapter-neon';
-import { Pool, neonConfig } from '@neondatabase/serverless';
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { Pool, neonConfig } from "@neondatabase/serverless";
 import { env } from "~/env";
-import ws from 'ws';
+import ws from "ws";
 
 // Configure Neon database with Prisma
 neonConfig.webSocketConstructor = ws;

@@ -3,18 +3,23 @@ import { Progress } from "~/components/ui/progress";
 import { Skeleton } from "~/components/ui/skeleton";
 
 interface LeaveBalanceCardProps {
-  type: 'sick' | 'vacation';
+  type: "sick" | "vacation";
   balance: number | undefined;
   totalHours: number;
   isLoading?: boolean;
 }
 
-export function LeaveBalanceCard({ type, balance, totalHours, isLoading }: LeaveBalanceCardProps) {
+export function LeaveBalanceCard({
+  type,
+  balance,
+  totalHours,
+  isLoading,
+}: LeaveBalanceCardProps) {
   if (isLoading) {
     return <LeaveBalanceCardSkeleton type={type} />;
   }
 
-  const title = type === 'sick' ? 'Sick Leave' : 'Vacation Leave';
+  const title = type === "sick" ? "Sick Leave" : "Vacation Leave";
   const usedHours = totalHours - (balance ?? 0);
   const progressValue = ((balance ?? 0) / totalHours) * 100;
 
@@ -25,18 +30,13 @@ export function LeaveBalanceCard({ type, balance, totalHours, isLoading }: Leave
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="text-3xl font-bold">
-            {balance} hours
-          </div>
+          <div className="text-3xl font-bold">{balance} hours</div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-gray-500">
               <span>Used: {usedHours} hours</span>
               <span>Total: {totalHours} hours</span>
             </div>
-            <Progress
-              value={progressValue}
-              className="h-2"
-            />
+            <Progress value={progressValue} className="h-2" />
           </div>
         </div>
       </CardContent>
@@ -44,9 +44,9 @@ export function LeaveBalanceCard({ type, balance, totalHours, isLoading }: Leave
   );
 }
 
-function LeaveBalanceCardSkeleton({ type }: { type: 'sick' | 'vacation' }) {
-  const title = type === 'sick' ? 'Sick Leave' : 'Vacation Leave';
-  
+function LeaveBalanceCardSkeleton({ type }: { type: "sick" | "vacation" }) {
+  const title = type === "sick" ? "Sick Leave" : "Vacation Leave";
+
   return (
     <Card>
       <CardHeader>
@@ -66,4 +66,4 @@ function LeaveBalanceCardSkeleton({ type }: { type: 'sick' | 'vacation' }) {
       </CardContent>
     </Card>
   );
-} 
+}

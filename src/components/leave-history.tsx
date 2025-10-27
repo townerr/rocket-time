@@ -52,13 +52,13 @@ export function LeaveHistory({ history, isLoading }: LeaveHistoryProps) {
             <TableBody>
               {history.map((entry) => (
                 <TableRow key={entry.id}>
-                  <TableCell>{format(entry.date, 'MMM d, yyyy')}</TableCell>
+                  <TableCell>{format(entry.date, "MMM d, yyyy")}</TableCell>
                   <TableCell>
                     <span
-                      className={`inline-block px-2 py-1 rounded text-sm ${
-                        entry.type === 'Vacation'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-orange-100 text-orange-800'
+                      className={`inline-block rounded px-2 py-1 text-sm ${
+                        entry.type === "Vacation"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-orange-100 text-orange-800"
                       }`}
                     >
                       {entry.type}
@@ -66,20 +66,20 @@ export function LeaveHistory({ history, isLoading }: LeaveHistoryProps) {
                   </TableCell>
                   <TableCell>{entry.hours} hours</TableCell>
                   <TableCell>
-                    {format(entry.timesheet.weekStart, 'MMM d')} -{' '}
-                    {format(entry.timesheet.weekEnd, 'MMM d, yyyy')}
+                    {format(entry.timesheet.weekStart, "MMM d")} -{" "}
+                    {format(entry.timesheet.weekEnd, "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`inline-block px-2 py-1 rounded text-sm ${
-                        entry.timesheet.status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-800'
+                      className={`inline-block rounded px-2 py-1 text-sm ${
+                        entry.timesheet.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
                           : entry.timesheet.status
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {entry.timesheet.status || 'Draft'}
+                      {entry.timesheet.status || "Draft"}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -114,4 +114,4 @@ function LeaveHistorySkeleton() {
       </CardContent>
     </Card>
   );
-} 
+}

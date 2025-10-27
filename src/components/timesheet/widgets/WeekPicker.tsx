@@ -19,11 +19,7 @@ export function WeekPicker({ value, onChange }: WeekPickerProps) {
 
   return (
     <div className="flex items-center gap-4">
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handlePreviousWeek}
-      >
+      <Button variant="outline" size="icon" onClick={handlePreviousWeek}>
         <ChevronLeft className="h-4 w-4" />
       </Button>
 
@@ -33,13 +29,9 @@ export function WeekPicker({ value, onChange }: WeekPickerProps) {
         </span>
       </div>
 
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleNextWeek}
-      >
+      <Button variant="outline" size="icon" onClick={handleNextWeek}>
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>
   );
-} 
+}

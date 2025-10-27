@@ -4,7 +4,14 @@ import { TableCell, TableRow } from "~/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
 import { EmployeeDetails } from "./employee-details";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import { MoreHorizontal, UserCheck, UserMinus, UserX } from "lucide-react";
 import { useState } from "react";
 import { api } from "~/trpc/react";
@@ -36,14 +43,14 @@ export function EmployeeRow({ employee, onStatusChange }: EmployeeRowProps) {
     },
     onSettled: () => {
       setIsUpdating(false);
-    }
+    },
   });
 
   const handleStatusChange = (status: "active" | "inactive" | "terminated") => {
     setIsUpdating(true);
     updateEmployeeStatus.mutate({
       employeeId: employee.id,
-      status
+      status,
     });
   };
 
@@ -70,7 +77,10 @@ export function EmployeeRow({ employee, onStatusChange }: EmployeeRowProps) {
           <Avatar>
             <AvatarImage src={employee.image ?? undefined} />
             <AvatarFallback>
-              {employee.name?.split(" ").map(n => n[0]).join("")}
+              {employee.name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")}
             </AvatarFallback>
           </Avatar>
           <div>
@@ -81,12 +91,8 @@ export function EmployeeRow({ employee, onStatusChange }: EmployeeRowProps) {
           </div>
         </div>
       </TableCell>
-      <TableCell className="hidden md:table-cell">
-        {employee.email}
-      </TableCell>
-      <TableCell className="hidden md:table-cell">
-        Engineering
-      </TableCell>
+      <TableCell className="hidden md:table-cell">{employee.email}</TableCell>
+      <TableCell className="hidden md:table-cell">Engineering</TableCell>
       <TableCell className="hidden md:table-cell">
         <div className="flex items-center gap-2">
           <div className={`h-2 w-2 rounded-full ${statusDisplay.color}`} />
@@ -97,11 +103,13 @@ export function EmployeeRow({ employee, onStatusChange }: EmployeeRowProps) {
         <div className="flex items-center justify-end gap-2">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm">View Details</Button>
+              <Button variant="outline" size="sm">
+                View Details
+              </Button>
             </DialogTrigger>
             <EmployeeDetails employee={employee} />
           </Dialog>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" disabled={isUpdating}>
@@ -111,21 +119,21 @@ export function EmployeeRow({ employee, onStatusChange }: EmployeeRowProps) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Change Status</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => handleStatusChange("active")}
                 disabled={employee.status === "active" || isUpdating}
               >
                 <UserCheck className="mr-2 h-4 w-4" />
                 <span>Set as Active</span>
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => handleStatusChange("inactive")}
                 disabled={employee.status === "inactive" || isUpdating}
               >
                 <UserMinus className="mr-2 h-4 w-4" />
                 <span>Set as Inactive</span>
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => handleStatusChange("terminated")}
                 disabled={employee.status === "terminated" || isUpdating}
                 className="text-red-600"
@@ -139,4 +147,4 @@ export function EmployeeRow({ employee, onStatusChange }: EmployeeRowProps) {
       </TableCell>
     </TableRow>
   );
-} 
+}

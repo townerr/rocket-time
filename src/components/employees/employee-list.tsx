@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@prisma/client";
+import { type User } from "@prisma/client";
 import { Search } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import {

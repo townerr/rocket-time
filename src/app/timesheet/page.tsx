@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import {
   type TimesheetEntryData,
-  TimesheetPageProps,
+  type TimesheetPageProps,
 } from "~/components/timesheet/utils/types";
 
 // Component for loading state

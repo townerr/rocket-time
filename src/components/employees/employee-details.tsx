@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { type User } from "@prisma/client";
 import { Mail, Phone, Building2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {

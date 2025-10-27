@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { type User } from "@prisma/client";
 import { Button } from "~/components/ui/button";
 import { TableCell, TableRow } from "~/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";

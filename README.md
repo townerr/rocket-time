@@ -2,15 +2,10 @@
 
 This is a fake employee time management SaaS. It allows employees to easily submit timesheets, manage their profiles, and view their leave balances and timesheet history. For managers, it offers tools to approve or reject employee timesheets, manage team member profiles, customize time entry options, and view analytics.
 
-todo:
-- add more sso providers other than discord.
-- video demo
-- deploy and add url
-
 ## Demo
+Try the [RocketTime Demo](https://rocket-time.netlify.app) or watch the video demo below.
 
-(video demo)
-(demo url)
+https://github.com/user-attachments/assets/91dbbda8-8c73-404c-a231-dddb580647bd
 
 ## Tech Stack
 

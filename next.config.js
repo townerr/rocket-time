@@ -6,6 +6,13 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
+  serverExternalPackages: [
+    "ws",
+    "@neondatabase/serverless",
+    "@prisma/adapter-neon",
+    "@prisma/client",
+    "bcrypt",
+  ],
   eslint: {
     ignoreDuringBuilds: true,
   },

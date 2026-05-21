@@ -1,3 +1,5 @@
+import "server-only";
+
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { Pool, neonConfig } from "@neondatabase/serverless";

@@ -49,10 +49,10 @@ export function EmployeeList({
   return (
     <>
       <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-muted-foreground" />
         <Input
           placeholder="Search employees..."
-          className="pl-10"
+          className="border-primary/20 pl-10 focus-visible:ring-primary"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
         />

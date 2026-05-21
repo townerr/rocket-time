@@ -171,11 +171,13 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="mb-8 text-3xl font-bold">Manager Settings</h1>
+    <div className="container mx-auto max-w-7xl px-4 py-8">
+      <h1 className="mb-8 text-3xl font-bold text-brand-gradient">
+        Manager Settings
+      </h1>
 
-      <Card className="mb-6">
-        <CardHeader>
+      <Card className="mb-6 overflow-hidden border-t-4 border-t-primary shadow-brand">
+        <CardHeader className="bg-secondary/50">
           <CardTitle className="flex items-center justify-between">
             <span>Work Types</span>
             <Button onClick={() => handleOpenDialog()}>

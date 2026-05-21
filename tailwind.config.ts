@@ -55,6 +55,38 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        brand: {
+          from: "hsl(var(--brand-from))",
+          to: "hsl(var(--brand-to))",
+        },
+        status: {
+          approved: "hsl(var(--status-approved))",
+          "approved-bg": "hsl(var(--status-approved-bg))",
+          pending: "hsl(var(--status-pending))",
+          "pending-bg": "hsl(var(--status-pending-bg))",
+          rejected: "hsl(var(--status-rejected))",
+          "rejected-bg": "hsl(var(--status-rejected-bg))",
+          draft: "hsl(var(--status-draft))",
+          "draft-bg": "hsl(var(--status-draft-bg))",
+        },
+        type: {
+          project: "hsl(var(--type-project))",
+          "project-bg": "hsl(var(--type-project-bg))",
+          vacation: "hsl(var(--type-vacation))",
+          "vacation-bg": "hsl(var(--type-vacation-bg))",
+          sick: "hsl(var(--type-sick))",
+          "sick-bg": "hsl(var(--type-sick-bg))",
+          holiday: "hsl(var(--type-holiday))",
+          "holiday-bg": "hsl(var(--type-holiday-bg))",
+        },
+      },
+      backgroundImage: {
+        "brand-gradient":
+          "linear-gradient(to right, hsl(var(--brand-from)), hsl(var(--brand-to)))",
+      },
+      boxShadow: {
+        brand:
+          "0 4px 14px -2px hsl(var(--primary) / 0.15), 0 2px 6px -2px hsl(var(--primary) / 0.08)",
       },
       keyframes: {
         "accordion-down": {

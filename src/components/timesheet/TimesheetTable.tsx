@@ -1,6 +1,6 @@
 "use client";
 
-import { format, addDays, startOfWeek } from "date-fns";
+import { format, addDays, startOfWeek, isToday } from "date-fns";
 import { Clock } from "lucide-react";
 import { DayEntry } from "./DayEntry";
 import { AddEntryDialog } from "./widgets/AddEntryDialog";
@@ -30,16 +30,23 @@ export function TimesheetTable({
   return (
     <div className="w-full">
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-7">
-        {weekDays.map((date) => {
+        {weekDays.map((date, index) => {
           const dayEntries = getEntriesForDate(timesheet?.entries, date);
           const dayTotal = getDayTotalHours(timesheet?.entries, date);
+          const today = isToday(date);
 
           return (
             <div
               key={date.toISOString()}
-              className="flex h-full min-h-[300px] flex-col overflow-hidden rounded-lg border bg-white shadow-sm dark:bg-gray-900"
+              className={`flex h-full min-h-[300px] flex-col overflow-hidden rounded-lg border bg-card shadow-brand ${
+                today ? "ring-2 ring-primary/30" : ""
+              }`}
             >
-              <div className="border-b bg-gray-50 py-2 text-center dark:bg-gray-800">
+              <div
+                className={`border-b py-2 text-center ${
+                  index % 2 === 0 ? "bg-secondary" : "bg-accent"
+                }`}
+              >
                 <div className="font-medium">{format(date, "EEEE")}</div>
                 <div className="text-sm text-muted-foreground">
                   {format(date, "MMM d")}
@@ -72,7 +79,7 @@ export function TimesheetTable({
                 />
               </div>
 
-              <div className="mt-auto flex items-center justify-between border-t bg-gray-50 p-3 dark:bg-gray-800">
+              <div className="mt-auto flex items-center justify-between border-t bg-primary/5 p-3">
                 <span className="text-sm text-muted-foreground">Total</span>
                 <div className="flex items-center font-medium">
                   <Clock className="mr-1 h-3.5 w-3.5 text-muted-foreground" />

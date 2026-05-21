@@ -8,7 +8,7 @@ export default function HistoryPage() {
     api.profile.getTimesheetHistory.useQuery();
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto max-w-7xl px-4 py-8">
       <TimesheetHistory timesheets={timesheets ?? []} isLoading={isLoading} />
     </div>
   );

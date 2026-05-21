@@ -2,8 +2,9 @@ import React from "react";
 
 export const RocketIcon = () => {
   return (
-    <svg
-      className="h-6 w-6 text-white transition-colors duration-300 hover:animate-spin"
+    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 shadow-brand backdrop-blur-sm">
+      <svg
+        className="h-5 w-5 text-white transition-transform duration-300 hover:animate-spin"
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -19,11 +20,13 @@ export const RocketIcon = () => {
       <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
       <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
     </svg>
+    </div>
   );
 };
 
 export const RocketHomeIcon = () => {
   return (
+    <div className="rounded-full bg-brand-gradient p-6 shadow-brand">
     <svg
       className="h-48 w-48 text-white"
       xmlns="http://www.w3.org/2000/svg"
@@ -41,5 +44,6 @@ export const RocketHomeIcon = () => {
       <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
       <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
     </svg>
+    </div>
   );
 };

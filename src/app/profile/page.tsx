@@ -142,8 +142,9 @@ export default function ProfilePage() {
   };
 
   return (
-    <Card className="mx-auto max-w-2xl">
-      <CardHeader>
+    <div className="container mx-auto max-w-7xl px-4 py-8">
+    <Card className="mx-auto max-w-2xl overflow-hidden border-t-4 border-t-primary shadow-brand">
+      <CardHeader className="bg-secondary/50">
         <CardTitle>Profile Settings</CardTitle>
       </CardHeader>
       <CardContent>
@@ -203,5 +204,6 @@ export default function ProfilePage() {
         )}
       </CardContent>
     </Card>
+    </div>
   );
 }

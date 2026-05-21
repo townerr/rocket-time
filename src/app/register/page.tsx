@@ -124,10 +124,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">
+    <div className="flex min-h-[calc(100vh-4.25rem)] items-center justify-center bg-page-gradient px-4 py-8">
+      <Card className="w-full max-w-md overflow-hidden border-t-4 border-t-primary shadow-brand">
+        <CardHeader className="space-y-1 bg-secondary/50 text-center">
+          <CardTitle className="text-2xl font-bold text-brand-gradient">
             Create an account
           </CardTitle>
           <CardDescription>
@@ -180,13 +180,13 @@ export default function RegisterPage() {
               onChange={handleChange}
             />
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" variant="gradient" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Register"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Already have an account?{" "}
             <Button
               variant="link"

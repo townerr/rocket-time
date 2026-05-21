@@ -58,20 +58,20 @@ export function EmployeeRow({ employee, onStatusChange }: EmployeeRowProps) {
   const getStatusDisplay = (status: string | null | undefined) => {
     switch (status) {
       case "active":
-        return { color: "bg-green-500", text: "Active" };
+        return { color: "bg-status-approved", text: "Active" };
       case "inactive":
-        return { color: "bg-amber-500", text: "Inactive" };
+        return { color: "bg-status-pending", text: "Inactive" };
       case "terminated":
-        return { color: "bg-red-500", text: "Terminated" };
+        return { color: "bg-status-rejected", text: "Terminated" };
       default:
-        return { color: "bg-green-500", text: "Active" };
+        return { color: "bg-status-approved", text: "Active" };
     }
   };
 
   const statusDisplay = getStatusDisplay(employee.status);
 
   return (
-    <TableRow>
+    <TableRow className="transition-colors hover:bg-secondary/50">
       <TableCell>
         <div className="flex items-center gap-3">
           <Avatar>
@@ -136,7 +136,7 @@ export function EmployeeRow({ employee, onStatusChange }: EmployeeRowProps) {
               <DropdownMenuItem
                 onClick={() => handleStatusChange("terminated")}
                 disabled={employee.status === "terminated" || isUpdating}
-                className="text-red-600"
+                className="text-destructive"
               >
                 <UserX className="mr-2 h-4 w-4" />
                 <span>Terminate Employee</span>

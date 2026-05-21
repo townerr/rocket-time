@@ -16,11 +16,11 @@ import { WeekPicker } from "~/components/timesheet/widgets/WeekPicker";
 import { TimesheetTable } from "~/components/timesheet/TimesheetTable";
 import { useToast } from "~/hooks/use-toast";
 import { startOfWeek, format, addDays, endOfWeek } from "date-fns";
+import { Badge } from "~/components/ui/badge";
 import {
   CalendarIcon,
   ClockIcon,
   CheckIcon,
-  AlertCircleIcon,
 } from "lucide-react";
 import {
   type TimesheetEntryData,
@@ -30,8 +30,8 @@ import {
 // Component for loading state
 const TimesheetSkeleton = () => (
   <div className="space-y-4">
-    <div className="mb-4 h-8 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
-    <div className="h-[400px] animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+    <div className="mb-4 h-8 w-48 animate-pulse rounded bg-muted"></div>
+    <div className="h-[400px] animate-pulse rounded bg-muted"></div>
   </div>
 );
 
@@ -189,9 +189,9 @@ export default function TimesheetPage({}: TimesheetPageProps) {
   const isLoading = timesheetLoading || workTypesLoading;
 
   return (
-    <div className="container mx-auto max-w-7xl py-6">
-      <Card>
-        <CardHeader>
+    <div className="container mx-auto max-w-7xl py-8">
+      <Card className="overflow-hidden border-t-4 border-t-primary">
+        <CardHeader className="bg-secondary/50">
           <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>Weekly Timesheet</CardTitle>
@@ -204,9 +204,9 @@ export default function TimesheetPage({}: TimesheetPageProps) {
             <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
             {formattedDateRange}
             {isSubmitted && (
-              <div className="ml-4 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800/30 dark:text-green-400">
+              <Badge variant="success" className="ml-4">
                 Submitted
-              </div>
+              </Badge>
             )}
           </div>
         </CardHeader>

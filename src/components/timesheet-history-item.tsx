@@ -13,20 +13,10 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Badge } from "~/components/ui/badge";
-
-const ENTRY_TYPE_COLORS = {
-  Project: "bg-blue-100 text-blue-800 hover:bg-blue-100",
-  Vacation: "bg-green-100 text-green-800 hover:bg-green-100",
-  Sick: "bg-orange-100 text-orange-800 hover:bg-orange-100",
-  Holiday: "bg-purple-100 text-purple-800 hover:bg-purple-100",
-} as const;
-
-const STATUS_COLORS = {
-  pending: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
-  approved: "bg-green-100 text-green-800 hover:bg-green-100",
-  rejected: "bg-red-100 text-red-800 hover:bg-red-100",
-  draft: "bg-gray-100 text-gray-800 hover:bg-gray-100",
-} as const;
+import {
+  getEntryTypeBadgeClasses,
+  getStatusBadgeClasses,
+} from "~/lib/status-colors";
 
 interface TimesheetEntry {
   id: string;
@@ -63,18 +53,13 @@ export function TimesheetHistoryItem({ timesheet }: TimesheetHistoryItemProps) {
               {format(timesheet.weekStart, "MMM d")} -{" "}
               {format(timesheet.weekEnd, "MMM d, yyyy")}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               {totalHours} hours total
             </div>
           </div>
           <Badge
             variant="secondary"
-            className={`${
-              STATUS_COLORS[
-                (timesheet.status?.toLowerCase() ??
-                  "draft") as keyof typeof STATUS_COLORS
-              ]
-            }`}
+            className={getStatusBadgeClasses(timesheet.status)}
           >
             {timesheet.status || "Draft"}
           </Badge>
@@ -98,11 +83,7 @@ export function TimesheetHistoryItem({ timesheet }: TimesheetHistoryItemProps) {
                   <TableCell>
                     <Badge
                       variant="secondary"
-                      className={`${
-                        ENTRY_TYPE_COLORS[
-                          entry.type as keyof typeof ENTRY_TYPE_COLORS
-                        ]
-                      }`}
+                      className={getEntryTypeBadgeClasses(entry.type)}
                     >
                       {entry.type}
                     </Badge>
@@ -110,7 +91,7 @@ export function TimesheetHistoryItem({ timesheet }: TimesheetHistoryItemProps) {
                   <TableCell>{entry.hours} hours</TableCell>
                   <TableCell>
                     {entry.projectCode && (
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-muted-foreground">
                         Project: {entry.projectCode}
                       </span>
                     )}

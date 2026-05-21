@@ -42,12 +42,12 @@ import { Loader2, FileBarChart, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 
 const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#8884d8",
-  "#82ca9d",
+  "hsl(221, 83%, 53%)",
+  "hsl(173, 58%, 39%)",
+  "hsl(262, 83%, 58%)",
+  "hsl(38, 92%, 50%)",
+  "hsl(340, 75%, 55%)",
+  "hsl(199, 89%, 48%)",
 ];
 
 // Default placeholder data for empty charts
@@ -183,9 +183,9 @@ export default function AnalyticsPage() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+    <div className="container mx-auto max-w-7xl px-4 py-8">
+      <Card className="overflow-hidden border-t-4 border-t-primary shadow-brand">
+        <CardHeader className="flex flex-row items-center justify-between bg-secondary/50">
           <div>
             <CardTitle className="text-2xl font-bold">
               Analytics Dashboard
@@ -231,7 +231,7 @@ export default function AnalyticsPage() {
             </div>
           ) : (
             <Tabs defaultValue="hours" className="mt-6">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-3 bg-secondary">
                 <TabsTrigger value="hours">Hours by Employee</TabsTrigger>
                 <TabsTrigger value="projects">Project Distribution</TabsTrigger>
                 <TabsTrigger value="status">Timesheet Status</TabsTrigger>
@@ -258,7 +258,7 @@ export default function AnalyticsPage() {
                         <Legend />
                         <Bar
                           dataKey="hours"
-                          fill="#8884d8"
+                          fill={COLORS[0]}
                           name="Total Hours"
                         />
                       </BarChart>
@@ -292,7 +292,7 @@ export default function AnalyticsPage() {
                             percent: number;
                           }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                           outerRadius={100}
-                          fill="#8884d8"
+                          fill={COLORS[0]}
                           dataKey="value"
                         >
                           {displayedProjectData.map((entry, index) => (
@@ -340,12 +340,12 @@ export default function AnalyticsPage() {
                             percent: number;
                           }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                           outerRadius={100}
-                          fill="#8884d8"
+                          fill={COLORS[0]}
                           dataKey="value"
                         >
-                          <Cell fill="#8884d8" /> {/* Draft */}
-                          <Cell fill="#FFC107" /> {/* Pending */}
-                          <Cell fill="#4CAF50" /> {/* Approved */}
+                          <Cell fill={COLORS[5]} />
+                          <Cell fill={COLORS[3]} />
+                          <Cell fill={COLORS[1]} />
                         </Pie>
                         <Tooltip
                           formatter={(value: number) => [

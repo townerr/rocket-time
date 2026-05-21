@@ -21,7 +21,7 @@ export default function BalancesPage() {
     })) ?? [];
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto max-w-7xl px-4 py-8">
       <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
         <LeaveBalanceCard
           type="sick"

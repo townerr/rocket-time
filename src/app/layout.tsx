@@ -23,9 +23,7 @@ export default async function RootLayout({
       <body>
         <TRPCReactProvider>
           <Navbar session={session} />
-          <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            {children}
-          </main>
+          <main className="min-h-screen bg-page-gradient">{children}</main>
         </TRPCReactProvider>
       </body>
     </html>

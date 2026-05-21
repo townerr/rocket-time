@@ -41,12 +41,12 @@ interface NavbarProps {
 
 export function Navbar({ session }: NavbarProps) {
   return (
-    <nav className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 to-blue-500 shadow-lg">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <nav className="sticky top-0 z-50 bg-brand-gradient shadow-brand">
+      <div className="container mx-auto flex h-[4.25rem] items-center justify-between px-4">
         {/* Left side - Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2.5">
           <RocketIcon />
-          <span className="text-lg font-bold text-white transition-colors duration-300 hover:text-indigo-100">
+          <span className="text-lg font-bold text-white transition-colors duration-300 hover:text-white/90">
             RocketTime
           </span>
         </Link>
@@ -56,14 +56,14 @@ export function Navbar({ session }: NavbarProps) {
           {session?.user ? (
             <>
               <NavigationMenu className="hidden md:block">
-                <NavigationMenuList className="gap-4">
+                <NavigationMenuList className="gap-2">
                   <NavigationMenuItem>
                     <Link href="/timesheet" legacyBehavior passHref>
                       <NavigationMenuLink
                         className={cn(
                           "text-sm font-medium text-white transition-colors",
-                          "hover:bg-white/10",
-                          "rounded-md px-3.5 py-2.5",
+                          "hover:bg-white/20",
+                          "rounded-lg px-3.5 py-2.5",
                         )}
                       >
                         Timesheet
@@ -76,18 +76,18 @@ export function Navbar({ session }: NavbarProps) {
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="text-white hover:bg-white/10 hover:text-white"
+                          className="rounded-lg text-white hover:bg-white/20 hover:text-white"
                         >
                           Manager <ChevronDown className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-white/95 backdrop-blur-sm">
+                      <DropdownMenuContent className="border-border/50 bg-card/95 backdrop-blur-md">
                         <DropdownMenuItem asChild>
                           <Link
                             href="/manager/approvals"
                             className="flex items-center gap-2"
                           >
-                            <ClipboardCheck className="h-4 w-4" />
+                            <ClipboardCheck className="h-4 w-4 text-primary" />
                             Approvals
                           </Link>
                         </DropdownMenuItem>
@@ -96,7 +96,7 @@ export function Navbar({ session }: NavbarProps) {
                             href="/manager/employees"
                             className="flex items-center gap-2"
                           >
-                            <Users2 className="h-4 w-4" />
+                            <Users2 className="h-4 w-4 text-primary" />
                             Employee Management
                           </Link>
                         </DropdownMenuItem>
@@ -105,7 +105,7 @@ export function Navbar({ session }: NavbarProps) {
                             href="/manager/settings"
                             className="flex items-center gap-2"
                           >
-                            <CogIcon className="h-4 w-4" />
+                            <CogIcon className="h-4 w-4 text-primary" />
                             Timesheet Settings
                           </Link>
                         </DropdownMenuItem>
@@ -114,7 +114,7 @@ export function Navbar({ session }: NavbarProps) {
                             href="/manager/analytics"
                             className="flex items-center gap-2"
                           >
-                            <BarChart2 className="h-4 w-4" />
+                            <BarChart2 className="h-4 w-4 text-primary" />
                             Analytics
                           </Link>
                         </DropdownMenuItem>
@@ -127,15 +127,15 @@ export function Navbar({ session }: NavbarProps) {
               {/* User dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-1 transition-opacity hover:opacity-80">
-                  <Avatar className="h-8 w-8 ring-2 ring-white/20">
+                  <Avatar className="h-8 w-8 ring-2 ring-white/30">
                     <AvatarImage src={session.user.image ?? undefined} />
                   </Avatar>
                   <ChevronDown className="h-4 w-4 text-white" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white/95 backdrop-blur-sm">
+                <DropdownMenuContent className="border-border/50 bg-card/95 backdrop-blur-md">
                   <DropdownMenuItem asChild>
                     <Link href="/profile" className="flex items-center gap-2">
-                      <UserCircle className="h-4 w-4" />
+                      <UserCircle className="h-4 w-4 text-primary" />
                       Profile
                     </Link>
                   </DropdownMenuItem>
@@ -144,7 +144,7 @@ export function Navbar({ session }: NavbarProps) {
                       href="/profile/balances"
                       className="flex items-center gap-2"
                     >
-                      <Clock className="h-4 w-4" />
+                      <Clock className="h-4 w-4 text-primary" />
                       Balances
                     </Link>
                   </DropdownMenuItem>
@@ -153,13 +153,13 @@ export function Navbar({ session }: NavbarProps) {
                       href="/profile/history"
                       className="flex items-center gap-2"
                     >
-                      <History className="h-4 w-4" />
+                      <History className="h-4 w-4 text-primary" />
                       History
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => signOut({ callbackUrl: "/" })}
-                    className="flex items-center gap-2 text-red-600 focus:bg-red-50 focus:text-red-600"
+                    className="flex items-center gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive"
                   >
                     <LogOut className="h-4 w-4" />
                     Sign Out
@@ -170,8 +170,8 @@ export function Navbar({ session }: NavbarProps) {
           ) : (
             <Button
               asChild
-              variant="outline"
-              className="border-white text-blue-600 hover:text-blue-800"
+              variant="secondary"
+              className="bg-white text-primary shadow-sm hover:bg-white/90"
             >
               <Link href="/api/auth/signin">Sign In</Link>
             </Button>

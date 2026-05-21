@@ -20,9 +20,9 @@ export default function EmployeesPage() {
   if (isLoading) return <EmployeesPageSkeleton />;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card>
-        <CardHeader>
+    <div className="container mx-auto max-w-7xl px-4 py-8">
+      <Card className="overflow-hidden border-t-4 border-t-primary shadow-brand">
+        <CardHeader className="bg-secondary/50">
           <CardTitle className="text-2xl font-bold">
             Employee Management
           </CardTitle>

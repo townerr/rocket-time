@@ -13,6 +13,7 @@ import {
 import { Badge } from "~/components/ui/badge";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Separator } from "~/components/ui/separator";
+import { getStatusBadgeClasses } from "~/lib/status-colors";
 import type { Timesheet, Entry, WorkType } from "@prisma/client";
 import { type TimesheetHistoryProps } from "./utils/types";
 
@@ -25,10 +26,10 @@ export function TimesheetHistory({
   }
 
   return (
-    <Card className="shadow-md">
-      <CardHeader className="rounded-t-lg border-b bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/50 dark:to-blue-950/50">
+    <Card className="overflow-hidden border-t-4 border-t-primary shadow-brand">
+      <CardHeader className="rounded-t-lg border-b bg-brand-gradient text-white">
         <CardTitle className="flex items-center text-2xl font-bold">
-          <CalendarDays className="mr-2 h-5 w-5 text-indigo-500" />
+          <CalendarDays className="mr-2 h-5 w-5" />
           Timesheet History
         </CardTitle>
       </CardHeader>
@@ -36,11 +37,9 @@ export function TimesheetHistory({
         <Accordion type="single" collapsible className="w-full">
           {timesheets.length === 0 ? (
             <div className="py-12 text-center">
-              <FileText className="mx-auto mb-3 h-12 w-12 text-gray-300" />
-              <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">
-                No timesheets found
-              </h3>
-              <p className="mt-1 text-gray-500 dark:text-gray-400">
+              <FileText className="mx-auto mb-3 h-12 w-12 text-muted-foreground/40" />
+              <h3 className="text-lg font-medium">No timesheets found</h3>
+              <p className="mt-1 text-muted-foreground">
                 Your submitted timesheets will appear here
               </p>
             </div>
@@ -82,11 +81,11 @@ function TimesheetCard({
 
   return (
     <AccordionItem value={timesheet.id} className="border-b last:border-b-0">
-      <AccordionTrigger className="group px-6 py-4 transition-colors hover:bg-gray-50 hover:no-underline dark:hover:bg-gray-900/20">
+      <AccordionTrigger className="group px-6 py-4 transition-colors hover:bg-secondary/50 hover:no-underline">
         <div className="flex flex-1 items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50">
-              <CalendarDays className="h-5 w-5 text-indigo-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
+              <CalendarDays className="h-5 w-5 text-primary" />
             </div>
             <div className="text-left">
               <div className="text-base font-medium">
@@ -102,12 +101,8 @@ function TimesheetCard({
 
           <div className="flex items-center gap-3">
             <Badge
-              variant={timesheet.status === "pending" ? "secondary" : "outline"}
-              className={`mr-2 px-2 py-1 text-xs ${
-                timesheet.status === "pending"
-                  ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-                  : "bg-gray-100 text-gray-800 dark:bg-gray-800/50 dark:text-gray-300"
-              }`}
+              variant="secondary"
+              className={`mr-2 px-2 py-1 text-xs ${getStatusBadgeClasses(timesheet.status)}`}
             >
               {timesheet.status === "pending" ? "Pending" : "Draft"}
             </Badge>
@@ -125,7 +120,7 @@ function TimesheetCard({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                <div className="mb-2 text-sm font-medium text-muted-foreground">
                   {format(new Date(date), "EEEE, MMMM d")}
                 </div>
                 <div className="space-y-2">
@@ -181,8 +176,8 @@ function TimesheetCard({
 
 function TimesheetHistorySkeleton() {
   return (
-    <Card className="shadow-md">
-      <CardHeader className="rounded-t-lg border-b bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/50 dark:to-blue-950/50">
+    <Card className="overflow-hidden border-t-4 border-t-primary shadow-brand">
+      <CardHeader className="rounded-t-lg border-b bg-brand-gradient text-white">
         <CardTitle className="text-2xl font-bold">Timesheet History</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 p-6">

@@ -9,6 +9,10 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Skeleton } from "~/components/ui/skeleton";
+import {
+  getLeaveTypeBadgeClasses,
+  getStatusBadgeClasses,
+} from "~/lib/status-colors";
 
 interface LeaveHistoryEntry {
   id: string;
@@ -33,8 +37,8 @@ export function LeaveHistory({ history, isLoading }: LeaveHistoryProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="overflow-hidden border-t-4 border-t-primary shadow-brand">
+      <CardHeader className="bg-secondary/50">
         <CardTitle className="text-xl font-semibold">Leave History</CardTitle>
       </CardHeader>
       <CardContent>
@@ -54,13 +58,7 @@ export function LeaveHistory({ history, isLoading }: LeaveHistoryProps) {
                 <TableRow key={entry.id}>
                   <TableCell>{format(entry.date, "MMM d, yyyy")}</TableCell>
                   <TableCell>
-                    <span
-                      className={`inline-block rounded px-2 py-1 text-sm ${
-                        entry.type === "Vacation"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-orange-100 text-orange-800"
-                      }`}
-                    >
+                    <span className={getLeaveTypeBadgeClasses(entry.type)}>
                       {entry.type}
                     </span>
                   </TableCell>
@@ -71,13 +69,7 @@ export function LeaveHistory({ history, isLoading }: LeaveHistoryProps) {
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`inline-block rounded px-2 py-1 text-sm ${
-                        entry.timesheet.status === "pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : entry.timesheet.status
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
-                      }`}
+                      className={`inline-block rounded px-2 py-1 text-sm ${getStatusBadgeClasses(entry.timesheet.status)}`}
                     >
                       {entry.timesheet.status || "Draft"}
                     </span>
@@ -86,7 +78,7 @@ export function LeaveHistory({ history, isLoading }: LeaveHistoryProps) {
               ))}
               {history.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-gray-500">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground">
                     No leave history found
                   </TableCell>
                 </TableRow>
@@ -101,8 +93,8 @@ export function LeaveHistory({ history, isLoading }: LeaveHistoryProps) {
 
 function LeaveHistorySkeleton() {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="overflow-hidden border-t-4 border-t-primary shadow-brand">
+      <CardHeader className="bg-secondary/50">
         <CardTitle className="text-xl font-semibold">Leave History</CardTitle>
       </CardHeader>
       <CardContent>
